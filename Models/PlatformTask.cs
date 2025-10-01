@@ -14,5 +14,8 @@ namespace TangerineAutomationSystem.Models
         [JsonIgnore]
         public object Option { get; set; } = new { };
         public string OptionJson { get; set; } = "{}";
+        
+        // Platform task has its own internal flow (platform-level flow)
+        public ProcessFlow InternalFlow { get; set; } = new ProcessFlow { IsPlatformLevel = true };
     }
 }

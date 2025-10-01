@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 using TangerineAutomationSystem.Models;
 using TangerineAutomationSystem.Services;
@@ -33,8 +34,47 @@ namespace TangerineAutomationSystem.ViewModels
         {
             Nodes.Clear(); Connections.Clear();
             if (CurrentFlow == null) return;
-            foreach (var n in CurrentFlow.Nodes) Nodes.Add(n);
-            foreach (var c in CurrentFlow.Connections) Connections.Add(c);
+            foreach (var n in CurrentFlow.Nodes)
+            {
+                Nodes.Add(n);
+                // Subscribe to node position changes
+                n.PropertyChanged += Node_PropertyChanged;
+            }
+            foreach (var c in CurrentFlow.Connections)
+            {
+                Connections.Add(c);
+                UpdateConnectionPosition(c);
+            }
+        }
+
+        private void Node_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FlowNode.X) || e.PropertyName == nameof(FlowNode.Y))
+            {
+                UpdateAllConnectionPositions();
+            }
+        }
+
+        private void UpdateAllConnectionPositions()
+        {
+            foreach (var conn in Connections)
+            {
+                UpdateConnectionPosition(conn);
+            }
+        }
+
+        private void UpdateConnectionPosition(Connection conn)
+        {
+            var fromNode = Nodes.FirstOrDefault(n => n.Id == conn.FromNodeId);
+            var toNode = Nodes.FirstOrDefault(n => n.Id == conn.ToNodeId);
+            if (fromNode != null && toNode != null)
+            {
+                // Connect from center-right of fromNode to center-left of toNode
+                conn.FromX = fromNode.X + 80; // approximate width
+                conn.FromY = fromNode.Y + 20; // approximate height/2
+                conn.ToX = toNode.X;
+                conn.ToY = toNode.Y + 20;
+            }
         }
 
         public ICommand AddPlatformTaskCommand => new RelayCommand(_ =>

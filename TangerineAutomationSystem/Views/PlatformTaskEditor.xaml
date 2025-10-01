@@ -1,0 +1,52 @@
+<UserControl x:Class="TangerineAutomationSystem.Views.PlatformTaskEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:TangerineAutomationSystem.ViewModels"
+             xmlns:controls="clr-namespace:TangerineAutomationSystem.Views.Controls">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="平台任务管理" FontSize="16" FontWeight="Bold" Margin="0,0,0,8" />
+        
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="添加平台任务" Click="AddPlatformTask_Click" Margin="0,0,8,0" Padding="8,4" />
+            <Button Content="删除选中任务" Click="DeletePlatformTask_Click" Padding="8,4" />
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" BorderBrush="#DDD" BorderThickness="1" Margin="0,0,8,0">
+                <ListBox x:Name="TaskList" SelectionChanged="TaskList_SelectionChanged" 
+                         DisplayMemberPath="Name" />
+            </Border>
+
+            <Border Grid.Column="1" BorderBrush="#DDD" BorderThickness="1" Padding="8">
+                <Grid x:Name="TaskEditorPanel">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="任务名称" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox x:Name="TaskNameBox" Margin="0,0,0,12" />
+                        <TextBlock Text="任务描述" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <TextBox x:Name="TaskDescBox" Height="60" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+                    </StackPanel>
+
+                    <GroupBox Grid.Row="1" Header="任务流程编辑器" Margin="0,8,0,0">
+                        <controls:NodifyHostControl x:Name="TaskFlowEditor" />
+                    </GroupBox>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

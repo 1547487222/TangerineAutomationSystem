@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using TangerineAutomationSystem.Models;
 
 namespace TangerineAutomationSystem.ViewModels
 {
@@ -11,6 +12,19 @@ namespace TangerineAutomationSystem.ViewModels
         public object Model { get; set; } = null!;
         public ObservableCollection<TreeNodeViewModel> Children { get; set; } = new();
         public TreeNodeViewModel? Parent { get; set; }
+
+        // For Lab nodes, provide access to module function catalog
+        public ModuleFunctionCatalog? ModuleFunctionCatalog
+        {
+            get
+            {
+                if (Model is LaboratoryModel lab)
+                {
+                    return lab.ModuleFunctionCatalog;
+                }
+                return null;
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string p) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
