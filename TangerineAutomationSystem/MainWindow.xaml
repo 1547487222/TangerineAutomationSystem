@@ -45,7 +45,59 @@
                                 <StackPanel>
                                     <TextBlock Text="{Binding DisplayName}" FontSize="18" FontWeight="Bold"/>
                                     <TextBlock Text="节点类型：" Foreground="Gray" Margin="0,6,0,12"/>
-                                    <!-- same content as before, omitted for brevity -->
+                                    
+                                    <!-- Platform Editor with Tasks -->
+                                    <StackPanel Visibility="{Binding NodeType, Converter={StaticResource NodeTypeToVisibility}, ConverterParameter=Platform}">
+                                        <TextBlock Text="平台名称" />
+                                        <TextBox Text="{Binding Model.Name, Mode=TwoWay}" Margin="0,4"/>
+                                        <Separator Margin="0,12"/>
+                                        <TabControl>
+                                            <TabItem Header="基本信息">
+                                                <StackPanel Margin="8">
+                                                    <TextBlock Text="平台信息" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem Header="平台任务">
+                                                <views:PlatformTaskEditor DataContext="{Binding Model}" Margin="8"/>
+                                            </TabItem>
+                                        </TabControl>
+                                    </StackPanel>
+
+                                    <!-- Production Line Editor with Processes -->
+                                    <StackPanel Visibility="{Binding NodeType, Converter={StaticResource NodeTypeToVisibility}, ConverterParameter=Line}">
+                                        <TextBlock Text="产线名称" />
+                                        <TextBox Text="{Binding Model.Name, Mode=TwoWay}" Margin="0,4"/>
+                                        <Separator Margin="0,12"/>
+                                        <TabControl>
+                                            <TabItem Header="基本信息">
+                                                <StackPanel Margin="8">
+                                                    <TextBlock Text="产线信息" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem Header="工艺流程">
+                                                <views:ProductionLineProcessEditor DataContext="{Binding Model}" Margin="8"/>
+                                            </TabItem>
+                                        </TabControl>
+                                    </StackPanel>
+
+                                    <!-- Laboratory Editor with Module Catalog -->
+                                    <StackPanel Visibility="{Binding NodeType, Converter={StaticResource NodeTypeToVisibility}, ConverterParameter=Lab}">
+                                        <TextBlock Text="实验室名称" />
+                                        <TextBox Text="{Binding Model.Name, Mode=TwoWay}" Margin="0,4"/>
+                                        <Separator Margin="0,12"/>
+                                        <TabControl>
+                                            <TabItem Header="基本信息">
+                                                <StackPanel Margin="8">
+                                                    <TextBlock Text="实验室信息" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </TabItem>
+                                            <TabItem Header="模块功能表">
+                                                <views:ModuleFunctionCatalogEditor DataContext="{Binding ModuleFunctionCatalog}" Margin="8"/>
+                                            </TabItem>
+                                        </TabControl>
+                                    </StackPanel>
+                                    
+                                    <!-- Module Editor -->
                                     <StackPanel Visibility="{Binding NodeType, Converter={StaticResource NodeTypeToVisibility}, ConverterParameter=Module}">
                                         <TextBlock Text="模块名称" />
                                         <TextBox Text="{Binding Model.Name, Mode=TwoWay}" Margin="0,4"/>

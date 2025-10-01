@@ -9,6 +9,8 @@ namespace TangerineAutomationSystem.Models
         public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
         public ObservableCollection<ProductionLineModel> ProductionLines { get; set; } = new();
         public ObservableCollection<LabResourceModel> LabResources { get; set; } = new();
+        public ObservableCollection<ModuleDefinition> ModuleDefinitions { get; set; } = new();
+        public ModuleFunctionCatalog ModuleFunctionCatalog { get; set; } = new();
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string p) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
     }
@@ -18,6 +20,7 @@ namespace TangerineAutomationSystem.Models
         private string _name = "新产线";
         public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
         public ObservableCollection<PlatformModel> Platforms { get; set; } = new();
+        public ObservableCollection<ProductionLineProcess> ProductionLineProcesses { get; set; } = new();
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string p) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
     }
@@ -28,6 +31,7 @@ namespace TangerineAutomationSystem.Models
         public string Name { get => _name; set { _name = value; OnPropertyChanged(nameof(Name)); } }
         public ObservableCollection<ModuleModel> Modules { get; set; } = new();
         public ObservableCollection<PlatformResourceModel> PlatformResources { get; set; } = new();
+        public ObservableCollection<PlatformTask> PlatformTasks { get; set; } = new();
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string p) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
     }

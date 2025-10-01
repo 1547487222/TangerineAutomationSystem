@@ -17,6 +17,7 @@ namespace TangerineAutomationSystem.Views.Controls
         private Point _dragStart;
         private bool _isDragging;
         private FlowNode? _connectionStart;
+        private double _zoomLevel = 1.0;
 
         public NodifyHostControl()
         {
@@ -31,6 +32,25 @@ namespace TangerineAutomationSystem.Views.Controls
             PART_Items.PreviewMouseLeftButtonUp += PART_Items_PreviewMouseLeftButtonUp;
             PART_Items.PreviewMouseMove += PART_Items_PreviewMouseMove;
             PART_Items.PreviewMouseRightButtonDown += PART_Items_PreviewMouseRightButtonDown;
+            PART_Canvas.MouseWheel += PART_Canvas_MouseWheel;
+        }
+
+        private void PART_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // Zoom with mouse wheel
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                var delta = e.Delta > 0 ? 0.1 : -0.1;
+                SetZoom(_zoomLevel + delta);
+                e.Handled = true;
+            }
+        }
+
+        private void SetZoom(double zoom)
+        {
+            _zoomLevel = Math.Max(0.25, Math.Min(3.0, zoom));
+            PART_ScaleTransform.ScaleX = _zoomLevel;
+            PART_ScaleTransform.ScaleY = _zoomLevel;
         }
 
         private FlowNode? GetNodeUnderMouse(Point p)
@@ -133,6 +153,21 @@ namespace TangerineAutomationSystem.Views.Controls
                 n.Y = 40 + (i / cols) * 120;
                 i++;
             }
+        }
+
+        private void ZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+            SetZoom(_zoomLevel + 0.2);
+        }
+
+        private void ZoomOut_Click(object sender, RoutedEventArgs e)
+        {
+            SetZoom(_zoomLevel - 0.2);
+        }
+
+        private void ResetZoom_Click(object sender, RoutedEventArgs e)
+        {
+            SetZoom(1.0);
         }
     }
 }
