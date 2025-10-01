@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using TangerineAutomationSystem.Models;
+using TangerineAutomationSystem.ViewModels;
 
 namespace TangerineAutomationSystem.Views
 {
@@ -54,8 +55,17 @@ namespace TangerineAutomationSystem.Views
                 ProcessNameBox.TextChanged += (s, args) => { if (_selectedProcess != null) _selectedProcess.Name = ProcessNameBox.Text; };
                 ProcessDescBox.TextChanged += (s, args) => { if (_selectedProcess != null) _selectedProcess.Description = ProcessDescBox.Text; };
                 
-                // Set up the flow editor for this process
-                // The process consists of platform tasks, transfers, and module actions
+                // Set up the flow editor for this process's main flow
+                if (ProcessFlowEditor.DataContext is ProcessEditorViewModel vm)
+                {
+                    vm.CurrentFlow = _selectedProcess.MainFlow;
+                }
+                else
+                {
+                    var newVm = new ProcessEditorViewModel();
+                    newVm.CurrentFlow = _selectedProcess.MainFlow;
+                    ProcessFlowEditor.DataContext = newVm;
+                }
             }
         }
     }

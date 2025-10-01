@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using TangerineAutomationSystem.Models;
+using TangerineAutomationSystem.ViewModels;
 
 namespace TangerineAutomationSystem.Views
 {
@@ -54,8 +55,17 @@ namespace TangerineAutomationSystem.Views
                 TaskNameBox.TextChanged += (s, args) => { if (_selectedTask != null) _selectedTask.Name = TaskNameBox.Text; };
                 TaskDescBox.TextChanged += (s, args) => { if (_selectedTask != null) _selectedTask.Description = TaskDescBox.Text; };
                 
-                // Set up the flow editor for this task
-                // The task would have its own ProcessFlow representing its internal workflow
+                // Set up the flow editor for this task's internal flow
+                if (TaskFlowEditor.DataContext is ProcessEditorViewModel vm)
+                {
+                    vm.CurrentFlow = _selectedTask.InternalFlow;
+                }
+                else
+                {
+                    var newVm = new ProcessEditorViewModel();
+                    newVm.CurrentFlow = _selectedTask.InternalFlow;
+                    TaskFlowEditor.DataContext = newVm;
+                }
             }
         }
     }

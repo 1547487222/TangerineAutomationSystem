@@ -20,6 +20,25 @@
                         <Canvas.RenderTransform>
                             <ScaleTransform x:Name="PART_ScaleTransform" ScaleX="1" ScaleY="1" />
                         </Canvas.RenderTransform>
+                        
+                        <!-- Draw connections first (behind nodes) -->
+                        <ItemsControl ItemsSource="{Binding Connections}" x:Name="PART_Connections">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Line Stroke="#FF666666" StrokeThickness="2" 
+                                          X1="{Binding FromX}" Y1="{Binding FromY}"
+                                          X2="{Binding ToX}" Y2="{Binding ToY}"
+                                          StrokeDashArray="2,2" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        
+                        <!-- Draw nodes on top -->
                         <ItemsControl ItemsSource="{Binding Nodes}" x:Name="PART_Items">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -34,7 +53,26 @@
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="White" BorderBrush="#FFCCDDEE" BorderThickness="2" Padding="8" CornerRadius="6">
+                                    <Border Background="White" BorderThickness="2" Padding="8" CornerRadius="6">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Kind}" Value="PlatformTask">
+                                                        <Setter Property="BorderBrush" Value="#FF4A90E2" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Kind}" Value="ModuleAction">
+                                                        <Setter Property="BorderBrush" Value="#FF7ED321" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Kind}" Value="Transfer">
+                                                        <Setter Property="BorderBrush" Value="#FFF5A623" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Kind}" Value="Resource">
+                                                        <Setter Property="BorderBrush" Value="#FF9013FE" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                                <Setter Property="BorderBrush" Value="#FFCCDDEE" />
+                                            </Style>
+                                        </Border.Style>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" />
                                             <TextBlock Text="{Binding Kind}" Foreground="Gray" FontSize="11" />
@@ -48,7 +86,11 @@
 
                 <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left" Margin="4">
                     <Button Content="Add Node" Click="AddNode_Click" Style="{StaticResource ProcessToolboxButton}" />
+                    <Button Content="Add Platform Task" Click="AddPlatformTaskNode_Click" Style="{StaticResource ProcessToolboxButton}" />
+                    <Button Content="Add Transfer" Click="AddTransferNode_Click" Style="{StaticResource ProcessToolboxButton}" />
+                    <Button Content="Add Module Action" Click="AddModuleActionNode_Click" Style="{StaticResource ProcessToolboxButton}" />
                     <Button Content="Auto-Layout" Click="AutoLayout_Click" Style="{StaticResource ProcessToolboxButton}" />
+                    <Separator Margin="8,0" />
                     <Button Content="Zoom In" Click="ZoomIn_Click" Style="{StaticResource ProcessToolboxButton}" />
                     <Button Content="Zoom Out" Click="ZoomOut_Click" Style="{StaticResource ProcessToolboxButton}" />
                     <Button Content="Reset Zoom" Click="ResetZoom_Click" Style="{StaticResource ProcessToolboxButton}" />

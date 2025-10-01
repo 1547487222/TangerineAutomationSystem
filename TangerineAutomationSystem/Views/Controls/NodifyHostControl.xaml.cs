@@ -142,6 +142,42 @@ namespace TangerineAutomationSystem.Views.Controls
             }
         }
 
+        private void AddPlatformTaskNode_Click(object sender, RoutedEventArgs e)
+        {
+            if (_vm == null) return;
+            var node = new FlowNode { Name = $"PlatformTask_{_vm.Nodes.Count + 1}", X = 120 + _vm.Nodes.Count * 20, Y = 80 + _vm.Nodes.Count * 20, Kind = FlowNodeKind.PlatformTask };
+            if (_vm.CurrentFlow != null)
+            {
+                _vm.CurrentFlow.Nodes.Add(node);
+                _vm.Nodes.Add(node);
+                _vm.SelectedNode = node;
+            }
+        }
+
+        private void AddTransferNode_Click(object sender, RoutedEventArgs e)
+        {
+            if (_vm == null) return;
+            var node = new FlowNode { Name = $"Transfer_{_vm.Nodes.Count + 1}", X = 120 + _vm.Nodes.Count * 20, Y = 80 + _vm.Nodes.Count * 20, Kind = FlowNodeKind.Transfer };
+            if (_vm.CurrentFlow != null)
+            {
+                _vm.CurrentFlow.Nodes.Add(node);
+                _vm.Nodes.Add(node);
+                _vm.SelectedNode = node;
+            }
+        }
+
+        private void AddModuleActionNode_Click(object sender, RoutedEventArgs e)
+        {
+            if (_vm == null) return;
+            var node = new FlowNode { Name = $"ModuleAction_{_vm.Nodes.Count + 1}", X = 120 + _vm.Nodes.Count * 20, Y = 80 + _vm.Nodes.Count * 20, Kind = FlowNodeKind.ModuleAction };
+            if (_vm.CurrentFlow != null)
+            {
+                _vm.CurrentFlow.Nodes.Add(node);
+                _vm.Nodes.Add(node);
+                _vm.SelectedNode = node;
+            }
+        }
+
         private void AutoLayout_Click(object sender, RoutedEventArgs e)
         {
             if (_vm == null) return;
