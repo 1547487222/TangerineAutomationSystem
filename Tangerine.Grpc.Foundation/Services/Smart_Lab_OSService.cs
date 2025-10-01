@@ -60,6 +60,38 @@ namespace Tangerine.Grpc.Foundation.Services
                         };
                         processflowConfig.PlatformTaskConfigs.Add(platformTaskProfile);
                     }
+                    // Add transfer steps
+                    foreach (var transferStepInfo in item.TransferSteps)
+                    {
+                        var transferStepConfig = new TransferStepConfig
+                        {
+                            StepId = transferStepInfo.StepId,
+                            StepOrder = transferStepInfo.StepOrder,
+                            StepDescription = transferStepInfo.StepDescription,
+                            TransferModuleId = transferStepInfo.TransferModuleId,
+                            TransferDirection = transferStepInfo.TransferDirection,
+                            SourcePlatformId = transferStepInfo.SourcePlatformId,
+                            TargetPlatformId = transferStepInfo.TargetPlatformId,
+                        };
+                        processflowConfig.TransferStepConfigs.Add(transferStepConfig);
+                    }
+                    // Add module action steps
+                    foreach (var moduleActionStepInfo in item.ModuleActionSteps)
+                    {
+                        var moduleActionStepConfig = new ModuleActionStepConfig
+                        {
+                            StepId = moduleActionStepInfo.StepId,
+                            StepOrder = moduleActionStepInfo.StepOrder,
+                            StepDescription = moduleActionStepInfo.StepDescription,
+                            ModuleName = moduleActionStepInfo.ModuleName,
+                            ModuleSerialNumber = moduleActionStepInfo.ModuleSerialNumber,
+                            ModuleActionId = moduleActionStepInfo.ModuleActionId,
+                            ActionName = moduleActionStepInfo.ActionName,
+                            ActionDescription = moduleActionStepInfo.ActionDescription,
+                            ActionParameters = [.. moduleActionStepInfo.ActionParameters],
+                        };
+                        processflowConfig.ModuleActionStepConfigs.Add(moduleActionStepConfig);
+                    }
                     productionlineConfig.ProcessflowConfigs.Add(processflowConfig);
                 }
 
