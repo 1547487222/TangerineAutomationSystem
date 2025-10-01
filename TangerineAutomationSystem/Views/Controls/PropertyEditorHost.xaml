@@ -1,0 +1,8 @@
+<UserControl x:Class="TangerineAutomationSystem.Views.Controls.PropertyEditorHost"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+    <Grid>
+        <xctk:PropertyGrid x:Name="PART_PropertyGrid" SelectedObject="{Binding SelectedObject, RelativeSource={RelativeSource AncestorType=UserControl}}" ShowSearchBox="True" />
+    </Grid>
+</UserControl>
