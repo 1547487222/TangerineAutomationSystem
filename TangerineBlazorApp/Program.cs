@@ -2,6 +2,8 @@ using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
+using TangerineBlazorApp.Models;
 
 namespace TangerineBlazorApp
 {
@@ -12,11 +14,17 @@ namespace TangerineBlazorApp
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
+            
+            // Configure backend API settings
+            var backendSettings = builder.Configuration.GetSection("BackendApi").Get<BackendApiSettings>() ?? new BackendApiSettings();
+            builder.Services.AddSingleton(backendSettings);
+            
             builder.Services.AddAntDesign();
             builder.Services.AddSingleton<FlowLaunchService>();
             builder.Services.AddSingleton<Smart_Lab_OS.SmartLabOSSever.SmartLabOSSeverClient>(p => 
             {
-                var channel = GrpcChannel.ForAddress("https://localhost:7197", new GrpcChannelOptions
+                var settings = p.GetRequiredService<BackendApiSettings>();
+                var channel = GrpcChannel.ForAddress(settings.GrpcEndpoint, new GrpcChannelOptions
                 {
                     HttpHandler = new GrpcWebHandler(new HttpClientHandler()),
                     
