@@ -63,6 +63,9 @@ namespace Equipment.Bqjx.StandardPlatformSystem.Models
 
         public ObservableCollection<GrpcProjectPlatformsInOrderConfigOptions> PlatformsInOrder { get; set; } = [];
 
+        public ObservableCollection<GrpcProjectTransferStepOptions> TransferStepsInOrder { get; set; } = [];
+
+        public ObservableCollection<GrpcProjectModuleActionStepOptions> ModuleActionStepsInOrder { get; set; } = [];
 
 
 
@@ -94,6 +97,81 @@ namespace Equipment.Bqjx.StandardPlatformSystem.Models
             if (platformId != null)
             {
                 _grpcProjectProcessflowOptinos.PlatformFlowSteps.Remove(platformId);
+            }
+        }
+
+        [RelayCommand]
+        private void AddTransferStep(GrpcProjectTransferModuleModel transferModule)
+        {
+            if (transferModule == null)
+                return;
+            var step = new GrpcProjectTransferStepOptions
+            {
+                StepId = SnowflakeIdGenerator.Instance.GenerateYitId(),
+                StepOrder = TransferStepsInOrder.Count,
+                StepDescription = $"Transfer from Platform {transferModule.LeftPlatformModel?.PlatformName ?? "?"} to {transferModule.RightPlatformModel?.PlatformName ?? "?"}",
+                TransferModuleId = transferModule.GrpcProjectTransferModuleOptions.TransferModuleId,
+                TransferDirection = TransferDirection.Forward,
+                SourcePlatformId = transferModule.GrpcProjectTransferModuleOptions.LeftPlatformId,
+                TargetPlatformId = transferModule.GrpcProjectTransferModuleOptions.RightPlatformId,
+            };
+            TransferStepsInOrder.Add(step);
+            _grpcProjectProcessflowOptinos.TransferSteps.Add(step);
+        }
+
+        [RelayCommand]
+        private void RemoveTransferStep(GrpcProjectTransferStepOptions transferStep)
+        {
+            if (transferStep == null)
+                return;
+            TransferStepsInOrder.Remove(transferStep);
+            var step = _grpcProjectProcessflowOptinos.TransferSteps.FirstOrDefault(x => x.StepId == transferStep.StepId);
+            if (step != null)
+            {
+                _grpcProjectProcessflowOptinos.TransferSteps.Remove(step);
+            }
+        }
+
+        [RelayCommand]
+        private void AddModuleActionStep(ModuleFuncCodeParameterModel moduleAction)
+        {
+            if (moduleAction == null || moduleAction.Parameter.ModuleInfoParameter == null)
+                return;
+            var step = new GrpcProjectModuleActionStepOptions
+            {
+                StepId = SnowflakeIdGenerator.Instance.GenerateYitId(),
+                StepOrder = ModuleActionStepsInOrder.Count,
+                StepDescription = moduleAction.Parameter.FuncCodeDescription,
+                ModuleName = moduleAction.Parameter.ModuleInfoParameter.ModuleName,
+                ModuleSerialNumber = moduleAction.Parameter.ModuleInfoParameter.ModuleSerialNumber,
+                ModuleActionId = moduleAction.Parameter.ParameterId,
+                ActionName = moduleAction.Parameter.FuncCodeName,
+                ActionDescription = moduleAction.Parameter.FuncCodeDescription,
+                ActionParameters = [.. moduleAction.Parameter.FuncCodeParamterInfos.Select(p => new ParameterItem
+                {
+                    ParameterId = p.ParameterId,
+                    Name = p.ParameterName,
+                    Description = p.ParameterDescription,
+                    Value = p.ParameterValueFactory.FirstOrDefault().Value,
+                    Unit = p.ParameterUnit,
+                    MaxValue = p.ParameterMaxValue,
+                    MinValue = p.ParameterMinValue,
+                })],
+            };
+            ModuleActionStepsInOrder.Add(step);
+            _grpcProjectProcessflowOptinos.ModuleActionSteps.Add(step);
+        }
+
+        [RelayCommand]
+        private void RemoveModuleActionStep(GrpcProjectModuleActionStepOptions moduleActionStep)
+        {
+            if (moduleActionStep == null)
+                return;
+            ModuleActionStepsInOrder.Remove(moduleActionStep);
+            var step = _grpcProjectProcessflowOptinos.ModuleActionSteps.FirstOrDefault(x => x.StepId == moduleActionStep.StepId);
+            if (step != null)
+            {
+                _grpcProjectProcessflowOptinos.ModuleActionSteps.Remove(step);
             }
         }
     }

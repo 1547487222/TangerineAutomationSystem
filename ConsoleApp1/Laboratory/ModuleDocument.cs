@@ -175,7 +175,15 @@ namespace QStandaedPlatform.Engine.Laboratory
         /// </summary>
         public List<PlatformTaskProfile> PlatformTaskConfigs { get; set; } = [];
 
+        /// <summary>
+        /// 工艺流程内中转模块传输步骤配置
+        /// </summary>
+        public List<TransferStepConfig> TransferStepConfigs { get; set; } = [];
 
+        /// <summary>
+        /// 工艺流程内直接模块动作步骤配置
+        /// </summary>
+        public List<ModuleActionStepConfig> ModuleActionStepConfigs { get; set; } = [];
     }
 
     /// <summary>
@@ -232,6 +240,101 @@ namespace QStandaedPlatform.Engine.Laboratory
         /// 是否反转
         /// </summary>
         public bool IsReverse { get; set; } = false;
+    }
+
+    /// <summary>
+    /// 中转步骤配置（用于工艺流程中的中转操作）
+    /// </summary>
+    public class TransferStepConfig
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 关联的中转模块Id
+        /// </summary>
+        public long TransferModuleId { get; set; }
+        /// <summary>
+        /// 中转方向（Forward=正向, Backward=反向）
+        /// </summary>
+        public TransferDirection TransferDirection { get; set; } = TransferDirection.Forward;
+        /// <summary>
+        /// 源平台Id
+        /// </summary>
+        public long SourcePlatformId { get; set; }
+        /// <summary>
+        /// 目标平台Id
+        /// </summary>
+        public long TargetPlatformId { get; set; }
+    }
+
+    /// <summary>
+    /// 中转方向
+    /// </summary>
+    public enum TransferDirection
+    {
+        /// <summary>
+        /// 正向移动
+        /// </summary>
+        [Description("正向移动")]
+        Forward = 0,
+        /// <summary>
+        /// 反向移动
+        /// </summary>
+        [Description("反向移动")]
+        Backward = 1
+    }
+
+    /// <summary>
+    /// 模块动作步骤配置（用于工艺流程中直接调用模块动作）
+    /// </summary>
+    public class ModuleActionStepConfig
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块名称
+        /// </summary>
+        public string ModuleName { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块序列号
+        /// </summary>
+        public string ModuleSerialNumber { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块动作Id
+        /// </summary>
+        public Guid ModuleActionId { get; set; }
+        /// <summary>
+        /// 动作名称
+        /// </summary>
+        public string ActionName { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作描述
+        /// </summary>
+        public string ActionDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作参数配置
+        /// </summary>
+        public List<ParameterItem> ActionParameters { get; set; } = [];
     }
 
     public class PlatformOperationConfig
@@ -352,6 +455,10 @@ namespace QStandaedPlatform.Engine.Laboratory
         /// 平台任务描述
         /// </summary>
         public string PlatformTaskDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 步骤执行顺序（用于工艺流程中的排序，可选）
+        /// </summary>
+        public int StepOrder { get; set; }
         /// <summary>
         /// 平台动作配置集
         /// </summary>

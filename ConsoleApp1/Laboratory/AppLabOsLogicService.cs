@@ -208,10 +208,44 @@ namespace QStandaedPlatform.Engine.Laboratory
                         PlatformTaskId = platformFlowConfigOptions.FlowTaskId,
                         PlatformTaskCode = platformFlowConfigOptions.FlowTaskCode,
                         PlatformTaskDescription = platformFlowConfigOptions.FlowTaskDescription,
+                        StepOrder = platformsInOrder.StepOrder,
                         TaskEbrParameterConfigs = platformFlowConfigOptions.TaskEbrParameterConfigs,
                         ActionConfigs = [.. platformFlowConfigOptions.ActionConfigs.Select(p => (SequentialActionConfig)p.Clone())],
                     });
                 }
+
+                // Load transfer steps
+                foreach (var transferStep in grpcProjectProcessflowOptions.TransferSteps)
+                {
+                    processflow.TransferSteps.Add(new TransferStepInfo
+                    {
+                        StepId = transferStep.StepId,
+                        StepOrder = transferStep.StepOrder,
+                        StepDescription = transferStep.StepDescription,
+                        TransferModuleId = transferStep.TransferModuleId,
+                        TransferDirection = transferStep.TransferDirection,
+                        SourcePlatformId = transferStep.SourcePlatformId,
+                        TargetPlatformId = transferStep.TargetPlatformId,
+                    });
+                }
+
+                // Load module action steps
+                foreach (var moduleActionStep in grpcProjectProcessflowOptions.ModuleActionSteps)
+                {
+                    processflow.ModuleActionSteps.Add(new ModuleActionStepInfo
+                    {
+                        StepId = moduleActionStep.StepId,
+                        StepOrder = moduleActionStep.StepOrder,
+                        StepDescription = moduleActionStep.StepDescription,
+                        ModuleName = moduleActionStep.ModuleName,
+                        ModuleSerialNumber = moduleActionStep.ModuleSerialNumber,
+                        ModuleActionId = moduleActionStep.ModuleActionId,
+                        ActionName = moduleActionStep.ActionName,
+                        ActionDescription = moduleActionStep.ActionDescription,
+                        ActionParameters = [.. moduleActionStep.ActionParameters],
+                    });
+                }
+
                 Processflows.Add(processflow);
             }
 
@@ -303,15 +337,104 @@ namespace QStandaedPlatform.Engine.Laboratory
         public ProcessStep ProcessType { get; set; } = ProcessStep.Pretreatment;
 
         /// <summary>
-        /// 工艺流程的平台集合
+        /// 工艺流程的平台任务集合
         /// </summary>
         public List<PlatformTaskInfo> PlatformTasks { get; set; } = [];
+
+        /// <summary>
+        /// 工艺流程的中转步骤集合
+        /// </summary>
+        public List<TransferStepInfo> TransferSteps { get; set; } = [];
+
+        /// <summary>
+        /// 工艺流程的模块动作步骤集合
+        /// </summary>
+        public List<ModuleActionStepInfo> ModuleActionSteps { get; set; } = [];
 
         public PlatformTaskInfo GetPlatform(long platformId)
         {
             return PlatformTasks.First(p => p.PlatformId == platformId);
         }
     }
+
+    /// <summary>
+    /// 中转步骤信息
+    /// </summary>
+    public class TransferStepInfo
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 关联的中转模块Id
+        /// </summary>
+        public long TransferModuleId { get; set; }
+        /// <summary>
+        /// 中转方向
+        /// </summary>
+        public TransferDirection TransferDirection { get; set; } = TransferDirection.Forward;
+        /// <summary>
+        /// 源平台Id
+        /// </summary>
+        public long SourcePlatformId { get; set; }
+        /// <summary>
+        /// 目标平台Id
+        /// </summary>
+        public long TargetPlatformId { get; set; }
+    }
+
+    /// <summary>
+    /// 模块动作步骤信息
+    /// </summary>
+    public class ModuleActionStepInfo
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块名称
+        /// </summary>
+        public string ModuleName { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块序列号
+        /// </summary>
+        public string ModuleSerialNumber { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块动作Id
+        /// </summary>
+        public Guid ModuleActionId { get; set; }
+        /// <summary>
+        /// 动作名称
+        /// </summary>
+        public string ActionName { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作描述
+        /// </summary>
+        public string ActionDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作参数配置
+        /// </summary>
+        public List<ParameterItem> ActionParameters { get; set; } = [];
+    }
+
 
     public class PlatformInfo
     {
@@ -673,6 +796,7 @@ namespace QStandaedPlatform.Engine.Laboratory
         public string PlatformTaskCode { get; set; } = string.Empty;
         public string PlatformTaskDescription { get; set; } = string.Empty;
         public string FlowConfigPath { get; set; } = string.Empty;
+        public int StepOrder { get; set; }
         public List<SequentialActionConfig> ActionConfigs { get; set; } = [];
         public List<EbrParameterConfig> TaskEbrParameterConfigs { get; set; } = [];
     }

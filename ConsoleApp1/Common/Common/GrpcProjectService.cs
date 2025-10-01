@@ -230,6 +230,10 @@ namespace QStandaedPlatform.Engine.Common.Common
         /// 流程任务描述
         /// </summary>
         public string FlowTaskDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
     }
 
 
@@ -369,7 +373,96 @@ namespace QStandaedPlatform.Engine.Common.Common
         /// </summary>
         public List<GrpcProjectPlatformsInOrderConfigOptions> PlatformFlowSteps { get; set; } = [];
 
+        /// <summary>
+        /// 工艺流程中的中转步骤配置
+        /// </summary>
+        public List<GrpcProjectTransferStepOptions> TransferSteps { get; set; } = [];
+
+        /// <summary>
+        /// 工艺流程中的直接模块动作步骤配置
+        /// </summary>
+        public List<GrpcProjectModuleActionStepOptions> ModuleActionSteps { get; set; } = [];
+
     }
+
+    /// <summary>
+    /// 中转步骤配置选项
+    /// </summary>
+    public class GrpcProjectTransferStepOptions
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 关联的中转模块Id
+        /// </summary>
+        public long TransferModuleId { get; set; }
+        /// <summary>
+        /// 中转方向
+        /// </summary>
+        public TransferDirection TransferDirection { get; set; } = TransferDirection.Forward;
+        /// <summary>
+        /// 源平台Id
+        /// </summary>
+        public long SourcePlatformId { get; set; }
+        /// <summary>
+        /// 目标平台Id
+        /// </summary>
+        public long TargetPlatformId { get; set; }
+    }
+
+    /// <summary>
+    /// 模块动作步骤配置选项
+    /// </summary>
+    public class GrpcProjectModuleActionStepOptions
+    {
+        /// <summary>
+        /// 步骤Id
+        /// </summary>
+        public long StepId { get; set; }
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
+        /// 步骤描述
+        /// </summary>
+        public string StepDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块名称
+        /// </summary>
+        public string ModuleName { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块序列号
+        /// </summary>
+        public string ModuleSerialNumber { get; set; } = string.Empty;
+        /// <summary>
+        /// 模块动作Id
+        /// </summary>
+        public Guid ModuleActionId { get; set; }
+        /// <summary>
+        /// 动作名称
+        /// </summary>
+        public string ActionName { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作描述
+        /// </summary>
+        public string ActionDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 动作参数配置
+        /// </summary>
+        public List<ParameterItem> ActionParameters { get; set; } = [];
+    }
+
     /// <summary>
     /// 中转模块配置
     /// </summary>
