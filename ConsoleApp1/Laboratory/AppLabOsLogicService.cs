@@ -208,6 +208,7 @@ namespace QStandaedPlatform.Engine.Laboratory
                         PlatformTaskId = platformFlowConfigOptions.FlowTaskId,
                         PlatformTaskCode = platformFlowConfigOptions.FlowTaskCode,
                         PlatformTaskDescription = platformFlowConfigOptions.FlowTaskDescription,
+                        StepOrder = platformsInOrder.StepOrder,
                         TaskEbrParameterConfigs = platformFlowConfigOptions.TaskEbrParameterConfigs,
                         ActionConfigs = [.. platformFlowConfigOptions.ActionConfigs.Select(p => (SequentialActionConfig)p.Clone())],
                     });
@@ -795,6 +796,7 @@ namespace QStandaedPlatform.Engine.Laboratory
         public string PlatformTaskCode { get; set; } = string.Empty;
         public string PlatformTaskDescription { get; set; } = string.Empty;
         public string FlowConfigPath { get; set; } = string.Empty;
+        public int StepOrder { get; set; }
         public List<SequentialActionConfig> ActionConfigs { get; set; } = [];
         public List<EbrParameterConfig> TaskEbrParameterConfigs { get; set; } = [];
     }

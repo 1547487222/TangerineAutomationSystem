@@ -230,6 +230,10 @@ namespace QStandaedPlatform.Engine.Common.Common
         /// 流程任务描述
         /// </summary>
         public string FlowTaskDescription { get; set; } = string.Empty;
+        /// <summary>
+        /// 步骤执行顺序
+        /// </summary>
+        public int StepOrder { get; set; }
     }
 
 

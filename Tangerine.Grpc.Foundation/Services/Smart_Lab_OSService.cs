@@ -56,6 +56,7 @@ namespace Tangerine.Grpc.Foundation.Services
                             PlatformTaskCode = platformTaskInfo.PlatformTaskCode,
                             PlatformTaskDescription = platformTaskInfo.PlatformTaskDescription,
                             PlatformTaskId = platformTaskInfo.PlatformTaskId,
+                            StepOrder = platformTaskInfo.StepOrder,
                             ActionConfigs = platformTaskInfo.ActionConfigs,
                         };
                         processflowConfig.PlatformTaskConfigs.Add(platformTaskProfile);

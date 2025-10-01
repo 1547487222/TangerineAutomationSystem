@@ -456,6 +456,10 @@ namespace QStandaedPlatform.Engine.Laboratory
         /// </summary>
         public string PlatformTaskDescription { get; set; } = string.Empty;
         /// <summary>
+        /// 步骤执行顺序（用于工艺流程中的排序，可选）
+        /// </summary>
+        public int StepOrder { get; set; }
+        /// <summary>
         /// 平台动作配置集
         /// </summary>
         public List<SequentialActionConfig> ActionConfigs { get; set; } = [];
