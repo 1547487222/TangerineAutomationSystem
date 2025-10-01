@@ -31,6 +31,9 @@ namespace TangerineAutomationSystem.ViewModels
         private void AddProjectInternal(string name)
         {
             var lab = new LaboratoryModel { Name = name };
+            // Initialize with default module functions
+            lab.ModuleFunctionCatalog = ModuleFunctionCatalogInitializer.CreateDefaultCatalog();
+            
             var labNode = new TreeNodeViewModel { DisplayName = lab.Name, NodeType = "Lab", Model = lab };
 
             var line = new ProductionLineModel { Name = "产线-A" };
