@@ -1,0 +1,542 @@
+/**************************************************************************************
+	Lab OS Grpc 定义 
+	适用Lab OS V1.4 系统适用
+	1. 关于平台操作Grpc定义
+	2. 关于获取平台数据Grpc定义
+	3. 关于平台实验扫尾动作和实验前准备Grpc定义
+	4. 此版本只适用大部分平台系统，只能当成一种框架；具体实现还得根据具体业务做些增加修改适配！
+	2024-12-06 
+***************************************************************************************/
+
+syntax = "proto3";
+option csharp_namespace = "Smart_Lab_OS";
+import "google/protobuf/empty.proto";
+// Lab OS Grpc服务
+service SmartLabOSSever {
+
+// 关于平台操作及任务操作
+    // 初始化（回零）  上电自检  参数指定初始化指定平台  也可以支持初始化所有平台
+	// ***平台初始化后 平台进入Ready状态 等待任务启动
+	rpc Home(HomeRequest) returns (stream ResultResponse);
+
+	// 启动平台任务  指定平台，指定Sample参数，指定Protocol参数  返回当前步骤信息 直到99999完成
+	rpc StartTask(StartTaskRequest) returns (stream StepInfoResponse);
+
+	// 终止任务 指定平台 也支持所有平台停止  终止时候会有个过程，直到99999完成
+	rpc StopTask(StopTaskRequest) returns (stream ResultResponse);
+
+	// 暂停程序 指定平台 也支持所有平台暂停  返回成功与否，unary
+	rpc PauseTask (PauseTaskRequest) returns (ResultResponse);
+
+	// 继续任务 指定平台 也支持所有平台继续  返回当前步骤信息，直到99999完成
+	rpc ContinueTask(ContinueTaskRequest)returns(ResultResponse);
+
+	// 复位报警程序 指定平台 也支持所有平台  返回成功与否 unary，  ==> 有错误，处理完后，ContinueTask
+	rpc Reset (ResetRequest) returns (ResultResponse);
+	
+	// 紧急停止程序 指定平台 也支持所有平台  返回成功与否 unary    => 预留的，一旦触发，所有处理停止，且无法恢复继续执行，需要重新初始化系统  正逻辑为急停   反逻辑为释放急停状态
+	rpc EmergencyStop (EmergencyStopRequest) returns (ResultResponse);
+
+	// Protocol完成【接口名称：Finalize】 切换平台状态机到Ready状态 如果带仓库 需要增加平台托盘入库动作
+	rpc Finalize(FinalizeRequest) returns (ResultResponse);
+  
+// 数据获取 unary方式
+
+	// 获取平台运行状态  指定平台 也支持所有平台 返回平台状态列表 unary
+	rpc GetMachineStatus(GetMachineStatusRequest) returns (stream MachineStatusResponse);
+
+	// 获取平台报警信息  指定平台 也支持所有平台 返回机器报警信息列表 unary
+	rpc GetErrInfo(GetErrInfoRequest) returns (stream ErrInfoResponse);
+
+	// 获取平台监控数据信息  EHS信息   返回Json体 unary  
+	rpc GetMonitorData(GetMonitorDataRequest) returns (stream MonitorDataResponse);
+
+	// 获取样品EBR数据
+	rpc GetEBRDataInfo(GetEBRDataInfoRequest) returns (EBRDataResponse);
+
+	// 获取实验执行步骤信息
+	rpc GetStepInfo(GetStepInfoRequest) returns (stream StepInfoResponse);
+
+// 实验收尾及平台模块单独操作
+
+	//实验前准备接口 仪器校准放入到实验前
+	rpc PreperExperiment(PreperExperimentRequest) returns (stream ResultResponse);
+
+	//实验结束后系统封存接口
+	rpc SystemStorage(SystemStorageRequest) returns (stream ResultResponse);
+
+	//单独模块与机械手配合工作  例如单独浓缩
+	rpc SingleModuleWork(SingleModuleWorkRequest) returns (stream ResultResponse);
+
+	// 维护操作 管路排空等
+	rpc Maintenance(MaintenanceRequest) returns (stream ResultResponse);
+
+// 实验环境温度等设定
+	// 设置实验环境参数
+	rpc SetEnvironmentParams(SetEnvironmentParamsRequest) returns (ResultResponse);
+
+	// 获取当前实验环境数据
+	rpc GetEnvironmentData(GetEnvironmentDataRequest) returns (GetEnvironmentDataResponse);
+   
+	// 获取所有流程配置
+  rpc GetFlowConfigs(google.protobuf.Empty) returns (FlowConfigString);
+
+   // 设置流程配置
+  rpc SetFlowConfigs(FlowConfigString) returns (google.protobuf.Empty);
+}
+
+//==================Message定义 和 Request,Response==//
+message FlowConfigString {
+  // 序列化后的 JSON 内容
+  string json = 1;
+}
+
+// 公共部分
+	// 平台类型
+	enum PlatformEnum{
+		//无定义，所有平台
+		none = 0;
+		//加盐加液
+		addLiquidAndSolid = 1;
+		//离心
+		centrifugal = 2;
+		//移液吸磁
+		pipettor = 3;
+		//浓缩定容
+		concentration = 4;
+	}
+
+	// 样品类型
+	enum SampleType{
+		//未定义类型
+		undefine = 0;
+	}
+
+	// 耗材类型
+	enum MaterialType{
+		// 1ml枪头
+		tip1 = 0;
+		// 2ml小瓶
+		bottle2 = 1;
+		// 2ml离心管
+		centrifugalTube2 = 2;
+		// 2ml磁粉管
+		magnetTube2 = 3;
+
+	}
+
+	// 样品对象对象  还有关于耗材对象 样品-》耗材对象中 （暂不在grpc层）
+	message SampleInfo{
+		//任务ID
+		//int64 taskId = 1;
+		//样品ID 
+		int64 sampleId = 2;
+		//样品处理 ProtocolID
+		//int64 protocolId = 3;
+		//样品类型
+		//SampleType sampleType = 4;
+		//样品二维码
+		string qrCode = 5;
+		//样品位置代号 如Tube125-1.A01
+		string positionNo = 6;
+		//样品状态 使用，未使用，废弃等
+		//int32 status = 7;
+		//样品参数Json 如 加液参数，稀释倍数等
+		string protocolJson = 8;
+		//附加信息 如从属 哪个托盘
+		string additionalInfo = 9;
+		//保留字段1
+		string reserve1 = 10;
+		//保留字段2
+		string reserve2 = 11;
+		//保留字段3
+		string reserve3 = 12;
+
+		//样品名字 如xx市场白菜xx grpc层不需要
+		//string name = 13;
+	}
+
+	// 物料耗材对象信息
+	message MaterialInfo{
+		//耗材位置代号 如Tube125-1.A01
+		string positionNo = 1;
+	    //附加信息 如从属 哪个托盘
+		string additionalInfo = 2;
+		//类型 枪头 2ml小瓶 离心管等、、、
+		MaterialType type = 3;
+	    //保留字段1
+		string reserve1 = 4;
+		//保留字段2
+		string reserve2 = 5;
+		//保留字段3
+		string reserve3 = 6;
+
+	}
+
+	// 实验信息
+	message ExperimentInfo{
+		// 样品信息
+		SampleInfo sampleInfo = 1;
+		// 耗材信息
+		repeated MaterialInfo materialInfos = 2;
+	}
+
+	// 任务对象信息
+	message TaskInfo{
+		//任务ID
+		int64 taskId = 1;
+		//WorkFlow Id
+		int64 workFlowId = 2;
+		//WorkFlow params
+		string workFlowJson = 3;
+		//实验信息列表
+		repeated ExperimentInfo experimentInfo = 4;
+
+			repeated string sampleWellName = 5;
+	}
+
+	// 平台状态
+	message PlatformStatus{
+		//步骤号
+		int32 status = 2;
+		//步骤信息
+		string info = 3;
+	}
+
+	// 错误信息
+	message ErrInfo{
+		// 平台
+		string platformName = 1;
+		// 模块
+		string ModuleName = 2;
+		// 指定操作名 如加液 拆盖 ...
+		string operationName = 3;
+		// 报警号 为0无报警
+		int32 alarmCode = 4;
+		// 报警信息 
+		string alarmInfo = 5;
+	}
+
+	// 监控数据 EHS检测
+	message MonitorData{
+		//平台
+		string platformName = 1;
+		//数据Json
+		string dataJson = 2;
+	}
+
+	// EBR 数据 
+	message EBRData{
+		// 任务ID
+		int64 taskId = 1;
+		// 样品ID
+		int64 sampleId = 2;
+		//属性名
+		string propertyName = 3;
+		//属性值
+		string propertyValue = 4;
+		//值单位
+		string propertyUnit = 5;
+		//值类型
+		string valueType = 6;
+		//指定模块数据
+		string deviceName = 7;
+		//指定模块编号
+		string deviceNo = 8;
+		//指定平台名称
+		string platformName  = 9; 
+		// 记录时间
+		int64 logTime = 10;
+		//保留字段1
+		string reserve1 = 11;
+		//保留字段2
+		string reserve2 = 12;
+		//保留字段3
+		string reserve3 = 13;
+
+
+		// WorkFlow ID 
+		int64 workFlowId = 20;
+	}
+
+	//平台状态
+	enum MachineStatus{
+		//未知
+		unknown = 0;
+	    // 手动状态(备用)
+		manual = 1;    
+		// 待机状态
+        ready = 2;      
+		// 运行状态
+        running = 3;     
+		// 未回零状态
+        noHome = 4;      
+		// 回零中状态
+        homing = 5;      
+		// 单步状态
+        stepByStep = 6;  
+		// 暂停状态
+        pausing = 7;     
+		// 停止状态
+        stopping = 8;    
+		// 报警状态
+        alarm = 9;     
+		// 急停状态
+        emergency = 10;    
+	}
+
+// 关于平台操作及任务操作 Request
+  // 回零初始化请求
+  message HomeRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+  }
+
+  // 启动平台任务
+  message StartTaskRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+	//任务信息
+	TaskInfo taskInfo = 2;
+  }
+
+  // 停止平台任务
+  message StopTaskRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+	//任务信息 （以后版本：指定则停止指定任务，否则所有任务）
+	//TaskInfo taskInfo = 2;
+  }
+
+  // 暂停平台任务
+  message PauseTaskRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+    //任务信息 （以后版本：指定则暂停指定任务，否则所有任务）
+	//TaskInfo taskInfo = 2;
+  }
+
+  // 继续平台任务
+  message ContinueTaskRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+    //任务信息 （以后版本：指定则继续指定任务，否则所有任务）
+	//TaskInfo taskInfo = 2;
+  }
+
+  // 复位平台报警
+  message ResetRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+  }
+
+  // 急停停止平台
+  message EmergencyStopRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+	//急停 OR 释放急停 1:急停 0:释放急停
+	int32 enable = 2;
+  }
+
+  // 操作结果返回
+  message ResultResponse{
+	// 平台
+	string platformName = 1;
+	// 步骤号 小于0为错误代码 大于0为正常返回 99999代表该操作成功执行完成
+	int32 stepNo = 2;
+	// 附加信息
+	string stepInfo = 3;
+  }
+
+  // Protocol 请求参数
+  message FinalizeRequest{
+	// 平台
+	string platformName = 1;
+  }
+
+// 数据获取 unary方式
+
+  // 获取平台运行状态
+  message GetMachineStatusRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+	//保留
+	string reserve1 = 2;
+  }
+
+  // 单个平台运行状态
+  message MachineResult{
+	 //平台名字 为空则执行所有平台操作
+	 string platformName = 1;	
+	 //平台状态
+	 MachineStatus machineStatus = 2;	
+	 //平台状态描述
+	 string description = 3;
+	 //保留
+	 string reserve1 = 4;
+  }
+
+  // 平台运行状态返回
+  message MachineStatusResponse{
+	 //平台状态机
+	 repeated MachineResult Data = 1;
+  }
+
+  // 获取平台报警信息     
+  message GetErrInfoRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+    //保留
+	string reserve1 = 2;
+  }
+
+  // 平台报警信息返回
+  message ErrInfoResponse{
+	  //报警信息
+	  ErrInfo errInfo = 1;
+	  //保留
+	  string reserve1 = 2;
+  }
+  
+  // 获取系统监控数据信息
+  message GetMonitorDataRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+    //保留
+	string reserve1 = 2;
+  }
+
+  // 获取系统监控数据信息返回
+  message MonitorDataResponse{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+	//监控数据
+	string dataJson= 2;
+	//保留
+	string reserve1 = 3;
+  }
+
+  // 获取样品EBR数据
+  message GetEBRDataInfoRequest{
+	// taskId
+	int64 taskId = 1;
+	// 样品ID 为0则返回TaskID下所有
+	int64 sampleId = 2;
+    // 保留
+	string reserve1 = 3;
+  }
+
+  // 样品EBR数据
+  message EBRDataResponse{
+	// EBR 数据 
+    repeated EBRData ebrData = 1;
+    // 保留
+	string reserve1 = 2;
+  }
+
+  // 获取实验执行步骤信息
+  message GetStepInfoRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;
+    //保留
+	string reserve1 = 2;
+  }
+
+  //实验执行步骤信息返回
+  message StepInfoResponse{
+	// 平台
+	string platformName = 1;
+	// 步骤号 小于0为错误代码 大于0为正常返回 99999代表该操作成功执行完成
+	int32 stepNo = 2;
+	// 附加信息
+	string stepInfo = 3;
+	// 样品组ID
+	repeated int64 sampleIds = 4;
+	// 样品组二维码
+	repeated string sampleQrCode = 5;
+
+  }
+
+// 实验收尾及平台模块单独操作
+
+  //实验前准备
+  message PreperExperimentRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+	// 参数
+	string paramsJson = 2;
+	// 保留
+	string reserve1 = 3;
+	// 保留
+	string reserve2 = 4;
+	// 保留
+	string reserve3 = 5;
+
+  }
+
+  //实验结束后实验封存
+  message SystemStorageRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+    // 参数
+	string paramsJson = 2;
+	// 保留
+	string reserve1 = 3;
+	// 保留
+	string reserve2 = 4;
+	// 保留
+	string reserve3 = 5;
+  }
+
+  //单独模块与机械手配合工作  例如单独浓缩
+  message SingleModuleWorkRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+	//任务信息
+	TaskInfo taskInfo = 2;
+	//模块名称
+	string moduleName = 3;
+	// 保留
+	string reserve1 = 4;
+	// 保留
+	string reserve2 = 5;
+	// 保留
+	string reserve3 = 6;
+  }
+
+  // 设备维护操作
+  message MaintenanceRequest{
+	//平台名字 为空则执行所有平台操作
+	string platformName = 1;	
+	// 参数
+	string paramsJson = 2;
+	// 保留
+	string reserve1 = 3;
+	// 保留
+	string reserve2 = 4;
+	// 保留
+	string reserve3 = 5;
+  }
+
+// 实验环境温度等设定
+
+  // 设置实验环境参数请求
+  message SetEnvironmentParamsRequest{
+	  //平台名字 为空则执行所有平台操作
+	  string platformName = 1;
+	  string dataJson = 2;
+  }
+
+  // 获取实验环境参数请求
+  message GetEnvironmentDataRequest{
+	  //平台名字 为空则执行所有平台操作
+	  string platformName = 1;
+  }
+
+  // 实验环境参数返回
+  message GetEnvironmentDataResponse{
+	  //平台名字 为空则执行所有平台操作
+	  string platformName = 1;
+	  string dataJson = 2;
+  }
+

@@ -1,0 +1,78 @@
+﻿@inject PlatformScheduleService platformScheduleService
+@page "/flowEdit"
+@using TangerineBlazorApp.Models
+<div style="background:#ECECEC; padding:10px;">
+    <Card style="margin-bottom:20px">
+        <TitleTemplate>
+            <Flex Justify="FlexJustify.SpaceBetween" Align="FlexAlign.Center">
+                <div>
+                    <Icon Type="@IconType.Outline.Apartment" /> 流程编辑
+                </div>
+                <div>
+                    <Button OnClick="Refresh">刷新</Button>
+                    <Button OnClick="Save">保存</Button>
+                </div>
+            </Flex>
+        </TitleTemplate>
+    </Card>
+
+    @foreach (var flow in FlowConfigs)
+    {
+        <Card style="margin-bottom:20px">
+            <TitleTemplate>
+                <Icon Type="@IconType.Outline.Appstore" /> @flow.FlowName
+            </TitleTemplate>
+            <Body>
+                <div class="module-container" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:15px;">
+                    @foreach (var mod in flow.ModuleConfigs)
+                    {
+                        <Card>
+                            <TitleTemplate>
+                                <Icon Type="@IconType.Outline.Edit" /> @mod.ModuleName
+                            </TitleTemplate>
+                            <Body>
+                                @foreach (var param in mod.Parameters)
+                                {
+                                    <div class="mb-3">
+                                        <label class="form-labe l">
+                                            @param.Name (@param.Unit)
+                                        </label>
+                                        <AntDesign.InputNumber @bind-Value="param.ValueFactory[0]" TValue="float" Style="width:100%" />
+                                        <p class="text-muted mb-0">@param.Description</p>
+                                    </div>
+                                }
+                            </Body>
+                        </Card>
+                    }
+                </div>
+            </Body>
+        </Card>
+    }
+</div>
+
+@code {
+    protected static List<FlowConfig> FlowConfigs { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!FlowConfigs.Any())
+        {
+            FlowConfigs =await ConfigDatas();
+        }
+    }
+
+    protected async Task Refresh()
+    {
+        FlowConfigs = await ConfigDatas();
+    }
+
+    protected async Task Save()
+    {
+        await platformScheduleService.SetFlowConfigsAsync(FlowConfigs);
+    }
+
+    protected async Task<List<FlowConfig>> ConfigDatas()
+    {
+       return await platformScheduleService.GetFlowConfigsAsync();
+    }
+}

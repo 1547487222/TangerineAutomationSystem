@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9-windows;net8-windows;net6-windows;net5-windows;netcoreapp3.1;net48;net472</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>miroiu</Authors>
+    <Company />
+    <PackageId>Nodify</PackageId>
+    <Product>Nodify</Product>
+    <Description>The core controls for a node based editor (designed for MVVM)</Description>
+    <Copyright>Miroiu Emanuel</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/miroiu/nodify</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/miroiu/nodify</RepositoryUrl>
+    <PackageTags>wpf mvvm node network node-editor graph controls</PackageTags>
+    <Version>6.6.0</Version>
+    <PackageReleaseNotes>
+      > - Features:
+      >	  - Added InputGroupStyle and OutputGroupStyle to Node
+      >	  - Added PanWithMouseWheel, PanHorizontalModifierKey and PanVerticalModifierKey to EditorGestures.Editor
+      >	  - Added CornerRadius dependency property to LineConnection, CircuitConnection and StepConnection
+      >	  - Added EditorGestures.Editor.PushItems gesture used to start pushing ItemContainers vertically or horizontally
+      >	  - Added PushedAreaStyle, PushedAreaOrientation and IsPushingItems dependency properties to NodifyEditor
+      >	  - Added NodifyEditor.SnapToGrid utility function
+      > - Bugfixes:
+      >	  - Fixed ItemContainer.BorderBrush and ItemContainer.SelectedBrush not reacting to theme changes
+    </PackageReleaseNotes>
+    <AssemblyOriginatorKeyFile>..\build\Nodify.snk</AssemblyOriginatorKeyFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472' OR '$(TargetFramework)'=='net48'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

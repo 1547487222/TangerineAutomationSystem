@@ -1,0 +1,446 @@
+﻿<UserControl
+    x:Class="Equipment.Bqjx.StandardPlatformSystem.Views.PlatformCreateView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:handycontrol="https://handyorg.github.io/handycontrol"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Margin="5" Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="300" />
+        </Grid.RowDefinitions>
+
+        <!--  Top Section: Platform Details and Flow Items  -->
+        <Border
+            Grid.Row="0"
+            Margin="0,0,0,15"
+            Padding="15"
+            Background="White"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1"
+            CornerRadius="8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Left: Platform Details  -->
+                <materialDesign:Card
+                    Margin="0,0,10,0"
+                    Padding="5"
+                    Background="#FAFAFA">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Foreground="{DynamicResource PrimaryHueMidBrush}"
+                            Text="平台信息" />
+                        <!--  Platform Name  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="平台名称：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="平台名称"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformName, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="输入平台名称" />
+                        </StackPanel>
+
+                        <!--  Platform Code  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="平台编号：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="平台编号"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformCode, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="输入平台编号" />
+                        </StackPanel>
+
+                        <!--  Platform Type  -->
+                        <!--<StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="平台类型：" />
+                            <ComboBox
+                                Width="320"
+                                Height="40"
+                                materialDesign:HintAssist.Hint="平台类型"
+                                FontSize="14"
+                                ItemsSource="{Binding PlatformTypes}"
+                                SelectedValue="{Binding PlatformType, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                ToolTip="选择平台类型" />
+                        </StackPanel>-->
+
+                        <!--  Platform Description  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Top"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="平台描述：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                materialDesign:HintAssist.Hint="平台描述"
+                                AcceptsReturn="True"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformDescription, UpdateSourceTrigger=PropertyChanged}"
+                                TextWrapping="Wrap"
+                                ToolTip="输入平台描述" />
+                        </StackPanel>
+                        <!--  Platform 进样通量  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="进样通量：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="进样通量"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformSamplingFlux, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="输入进样通量" />
+                        </StackPanel>
+
+                        <!--  Platform 最大缓存量  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="最大缓存量：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="最大缓存量"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformMaxCacheCount, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="输入最大缓存量" />
+                        </StackPanel>
+
+                        <!--  Platform PlatformMaxExecuteCount  -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="最大执行次数：" />
+                            <TextBox
+                                Width="320"
+                                Height="40"
+                                Padding="10,5"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="最大执行次数"
+                                FontSize="14"
+                                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                Text="{Binding PlatformMaxExecuteCount, UpdateSourceTrigger=PropertyChanged}"
+                                ToolTip="输入最大执行次数" />
+                        </StackPanel>
+
+                        <!--  Platform -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="平台参数信息：" />
+                            <ComboBox
+                                Width="320"
+                                Height="40"
+                                materialDesign:HintAssist.Hint="平台参数信息"
+                                DisplayMemberPath="ModuleName"
+                                FontSize="14"
+                                ItemsSource="{Binding ModuleInfoParameterModels}"
+                                SelectedItem="{Binding PlatformModuleInfoParameterModel}"
+                                Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                ToolTip="平台参数信息" />
+                        </StackPanel>
+
+                        <!--  Platform抓取动作信息 -->
+                        <StackPanel Margin="0,0,0,10" Orientation="Horizontal">
+                            <TextBlock
+                                Width="100"
+                                VerticalAlignment="Center"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="抓取动作信息：" />
+                            <ComboBox
+                                Width="320"
+                                Height="40"
+                                DisplayMemberPath="ParameterDescription"
+                                FontSize="14"
+                                ItemsSource="{Binding ModuleFuncCodeParameterModels}"
+                                SelectedItem="{Binding PlatformGrabActionParameterModel}"
+                                Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                                ToolTip="抓取动作信息" />
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!--  Right: Flow Edit Items  -->
+                <Border Grid.Column="1" Margin="2,0,0,0">
+                    <ScrollViewer MaxHeight="350" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding FlowEditItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <materialDesign:Card
+                                        Margin="0,5"
+                                        Padding="10"
+                                        Background="#FAFAFA">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,5">
+                                                <TextBlock
+                                                    FontSize="16"
+                                                    FontWeight="Bold"
+                                                    Foreground="{DynamicResource DarkInfoBrush}"
+                                                    Text="{Binding EditItemName}" />
+                                            </Grid>
+                                            <ListBox
+                                                Margin="0,0,0,5"
+                                                ItemsSource="{Binding Files}"
+                                                Style="{StaticResource MaterialDesignNavigationSecondaryListBox}">
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock
+                                                                VerticalAlignment="Center"
+                                                                FontSize="14"
+                                                                Text="{Binding Flow.FlowName}" />
+                                                            <Button
+                                                                Margin="10,0,5,0"
+                                                                Padding="8,4"
+                                                                Background="#2196F3"
+                                                                BorderThickness="0"
+                                                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}, Path=DataContext.EditItemCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                Content="编辑"
+                                                                Foreground="White"
+                                                                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                                                ToolTip="编辑此流程项" />
+                                                            <Button
+                                                                Margin="5,0,0,0"
+                                                                Padding="8,4"
+                                                                Background="#FF5252"
+                                                                BorderThickness="0"
+                                                                Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}, Path=DataContext.RemoveSelectedItemCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                Content="删除"
+                                                                Foreground="White"
+                                                                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                                                ToolTip="删除此流程项" />
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <StackPanel Orientation="Horizontal">
+                                                <ComboBox
+                                                    MinWidth="250"
+                                                    Margin="0,0,5,0"
+                                                    materialDesign:HintAssist.Hint="选择流程"
+                                                    FontSize="14"
+                                                    ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.FlowSources}"
+                                                    SelectedItem="{Binding SelectedFlow}"
+                                                    Style="{StaticResource MaterialDesignFloatingHintComboBox}">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock FontSize="14" Text="{Binding FlowName}" />
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                                <Button
+                                                    Padding="8,4"
+                                                    Background="#4CAF50"
+                                                    BorderThickness="0"
+                                                    Command="{Binding AddSelectedItemCommand}"
+                                                    Content="添加"
+                                                    FontSize="14"
+                                                    Foreground="White"
+                                                    Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                                    ToolTip="添加新流程项" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </materialDesign:Card>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!--  Bottom Section: Platform Monitor Data  -->
+        <Border
+            Grid.Row="1"
+            Background="White"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1"
+            CornerRadius="8">
+            <GroupBox Margin="10" Style="{StaticResource MaterialDesignCardGroupBox}">
+                <GroupBox.Header>
+                    <Grid>
+                        <TextBlock
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Text="平台监控数据项" />
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <Button
+                                Margin="0,0,5,0"
+                                Padding="8,4"
+                                Background="#4CAF50"
+                                BorderThickness="0"
+                                Command="{Binding AddPlatformMonitorItemCommand}"
+                                Content="新增"
+                                Foreground="White"
+                                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                ToolTip="新增监控数据项" />
+                            <Button
+                                Padding="8,4"
+                                Background="#FF5252"
+                                BorderThickness="0"
+                                Command="{Binding RemovePlatformMonitorItemCommand}"
+                                CommandParameter="{Binding ElementName=PlatformMonitorDataGrid, Path=SelectedItem}"
+                                Content="删除"
+                                Foreground="White"
+                                Style="{StaticResource MahApps.Styles.Button.Flat}"
+                                ToolTip="删除选中的监控数据项" />
+                        </StackPanel>
+                    </Grid>
+                </GroupBox.Header>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DataGrid
+                        x:Name="PlatformMonitorDataGrid"
+                        MinHeight="250"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        FontSize="14"
+                        HeadersVisibility="Column"
+                        ItemsSource="{Binding PlatformMonitorItems}"
+                        MinColumnWidth="100"
+                        Style="{StaticResource MaterialDesignDataGrid}">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="PLC">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            DisplayMemberPath="PartDesc"
+                                            ItemsSource="{Binding RefPartModels}"
+                                            SelectedItem="{Binding RefPartModel, UpdateSourceTrigger=PropertyChanged}"
+                                            Style="{StaticResource MaterialDesignComboBox}"
+                                            ToolTip="选择PLC" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="模块">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            DisplayMemberPath="ParameterDescription"
+                                            ItemsSource="{Binding ModuleInfoParameterModels}"
+                                            SelectedItem="{Binding MonitorModuleInfoParameterModel}"
+                                            Style="{StaticResource MaterialDesignComboBox}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="监控键">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding MonitorKey, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="键描述">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}" Text="{Binding MonitorKeyDescription, UpdateSourceTrigger=PropertyChanged}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="类型">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox
+                                            ItemsSource="{Binding MonitorTypes}"
+                                            SelectedItem="{Binding MonitorType}"
+                                            Style="{StaticResource MaterialDesignComboBox}"
+                                            ToolTip="选择监控类型" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding MonitorAddress, UpdateSourceTrigger=PropertyChanged}"
+                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                Header="地址" />
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding MonitorUnit, UpdateSourceTrigger=PropertyChanged}"
+                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                Header="单位" />
+                            <DataGridTextColumn
+                                Width="Auto"
+                                Binding="{Binding CharacterSize, UpdateSourceTrigger=PropertyChanged}"
+                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                Header="字符长度" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </ScrollViewer>
+            </GroupBox>
+        </Border>
+    </Grid>
+</UserControl>

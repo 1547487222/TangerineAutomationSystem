@@ -1,0 +1,524 @@
+syntax = "proto3";
+
+package smartlab;
+
+option csharp_namespace = "Tangerine.Grpc.Foundation";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// ----------------------------------------
+// 枚举定义
+// ----------------------------------------
+
+// 平台状态枚举
+enum PlatformStatus {
+  PLATFORM_STATUS_NOT_INITIALIZED   = 0; // 未初始化：平台不可执行
+  PLATFORM_STATUS_IN_PROGRESS       = 2; // 平台任务中：当前有任务正在执行
+  PLATFORM_STATUS_IDLE              = 3; // 平台空闲，平台等待启动
+  PLATFORM_STATUS_STARTED           = 1; // 平台已启动：平台已启动，等待任务
+  PLATFORM_STATUS_FAILED            = 4; // 平台错误：平台执行中发生异常
+  PLATFORM_STATUS_PAUSED            = 5; // 平台暂停：平台暂时被挂起
+  PLATFORM_STATUS_STOP              = 6; // 平台停止：平台已被主动停止（转为未初始化）
+}
+
+// 任务状态枚举
+enum TaskStatus {
+  TASK_STATUS_RUNNING    = 0; // 运行中
+  TASK_STATUS_FINISHED   = 1; // 已完成
+  TASK_STATUS_FAILED     = 2; // 异常
+  TASK_STATUS_PAUSED     = 3; // 暂停
+  TASK_STATUS_NOT_FOUND  = 4; // 未找到
+  TASK_STATUS_CANCELED   = 5; // 已取消
+  TASK_STATUS_REENTRY    = 6; // 任务重入
+}
+
+//中转状态枚举
+enum TransferStatus 
+{
+  //占用
+  TRANSFER_STATUS_OCCUPIED = 0;
+  //空闲
+  TRANSFER_STATUS_IDLE = 1;
+}
+
+
+// ----------------------------------------
+// 消息定义
+// ----------------------------------------
+
+// 通用状态返回
+message Status {
+  int32 code     = 1; // 0=成功，非0=错误码
+  string message = 2; // 状态描述
+}
+
+message StartTaskStatus
+{
+  TaskStatus status = 1;  // 任务状态
+  string message    = 2;     // 状态描述
+}
+
+
+// 平台请求（通用）
+message PlatformRequest {
+  int64 platform_id = 1; // 平台 ID
+}
+
+// ----------------------------------------
+// 进样任务信息
+// ----------------------------------------
+
+message SamplingTaskInfo {
+  int64 original_sample_id = 1;   // 原始进样 ID
+  int64  sample_id         = 2;   // 唯一进样 ID
+  int32  sample_group_id   = 3;   // 进样组 ID
+  string sample_type       = 4;   // 样品类型
+  string sample_name       = 5;   // 样品名称
+  string sample_remarks    = 6;   // 样品备注
+  int64  tray_id           = 7;   // 托盘 ID
+  int64  well_id           = 8;   // 孔位 ID（目前等同于进样 ID）
+  string well_name         = 9;   // 孔位名称
+}
+
+// ----------------------------------------
+// 实验室配置
+// ----------------------------------------
+
+message LaboratoryDefinition {
+  string laboratory_json = 4; // 实验室配置内容（JSON 格式）
+}
+
+// ----------------------------------------
+// 平台状态响应
+// ----------------------------------------
+
+message PlatformStatusResponseMessage {
+  int64 platform_id      = 2; // 平台 ID（回显）
+  PlatformStatus platform_status = 5; // 平台当前状态
+}
+
+// ----------------------------------------
+// 告警信息
+// ----------------------------------------
+
+message AlarmEvent {
+  int64 platform_id = 2;            // 平台 ID（回显）
+  ModularAlarm modular_alarm = 5;  // 模块告警
+}
+
+message ModularAlarm {
+  string module_ip           = 1; // 模块 IP
+  string module_name         = 2; // 模块名称
+  string alarm_code          = 3; // 告警编码
+  string action_description  = 4; // 告警动作描述
+  string internal_alarm_message   = 5; // 内部告警信息
+  string details_alarm_message    = 6; // 详细告警信息
+  google.protobuf.Timestamp record_time = 7; // 告警时间
+}
+
+// ----------------------------------------
+// 中转服务
+// ----------------------------------------
+
+message TransferInitRequest {
+  int64 transfer_module_id = 2; // 中转模块 ID
+}
+
+
+message TransferInitResponseMessage {
+  int64 transfer_module_id  = 2; // 中转模块 ID
+  Status status             = 3; // 执行状态
+}
+
+// ----------------------------------------
+// 中转消息结构
+// ----------------------------------------
+
+
+message TransferTrayMoveRequest {
+  int64 platform_id           = 2; // 平台 ID
+  int64 transfer_module_id    = 4; // 中转模块 ID
+  repeated SamplingTaskInfo sampling_task_infos = 5; // 进样任务信息（必填）
+}
+
+message TransferTrayMoveResponse 
+{
+  int64 platform_id           = 2; // 平台 ID
+  int64 transfer_module_id    = 4; // 中转模块 ID
+  Status status               = 5; // 执行状态
+}
+
+/*
+*中转下料位到中转的上料位
+*/
+message UnloadTransferToLoadTransferRequest {
+    int64 unload_transfer_module_id  = 2; // 下料位中转模块 ID
+    int64 load_transfer_module_id    = 3; // 上料位中转模块 ID
+    repeated SamplingTaskInfo sampling_task_infos = 4; // 进样任务信息（必填）
+}
+
+//中转下料位到中转的上料位响应
+message UnloadTransferToLoadTransferResponse
+{
+    int64 unload_transfer_module_id  = 2; // 下料位中转模块 ID
+    int64 load_transfer_module_id    = 3; // 上料位中转模块 ID
+    Status status                    = 4; // 执行状态
+}
+
+/*
+*中转上料位到中转的下料位
+*/
+message LoadTransferToUnloadTransferRequest {
+    int64 load_transfer_module_id      = 2; // 上料位中转模块 ID
+    int64 unload_transfer_module_id    = 3; // 下料位中转模块 ID
+    repeated SamplingTaskInfo sampling_task_infos = 4; // 进样任务信息（必填）
+}
+//中转上料位到中转的下料位响应
+message LoadTransferToUnloadTransferResponse
+{
+    int64 load_transfer_module_id      = 2; // 上料位中转模块 ID
+    int64 unload_transfer_module_id    = 3; // 下料位中转模块 ID
+    Status status                      = 4; // 执行状态
+}
+
+/*
+*中转移动
+*/
+message TransferMoveRequest {
+  int64 transfer_module_id    = 2; // 中转模块 ID
+  repeated SamplingTaskInfo sampling_task_infos = 5; // 进样任务信息（必填）
+}
+
+/*
+*中转移动响应
+*/
+message TransferMoveResponseMessage {
+  int64  transfer_module_id     = 4; // 中转模块 ID
+  Status status                = 5; // 执行状态
+}
+
+//获取中转状态
+message TransferStatusRequest 
+{
+  int64 transfer_module_id    = 2; // 中转模块 ID
+
+}
+//获取中转状态响应
+message TransferStatusResponseMessage 
+{
+  int64 transfer_module_id       = 2; // 中转模块 ID
+  TransferStatus transfer_status = 5; // 中转状态
+}
+
+
+
+// ----------------------------------------
+// 平台初始化
+// ----------------------------------------
+
+message InitializeRequest {
+  int64 platform_id = 2;                  // 平台 ID
+  map<string, string> context = 4;        // 配置上下文信息
+}
+
+// ----------------------------------------
+// 任务服务
+// ----------------------------------------
+
+message PrepareTaskRequest {
+  int64  task_id            = 1;
+  string process_flow_id    = 2;           // 工艺流程 ID
+  int64  platform_id        = 3;
+  map<string, string> context = 4;        // 配置上下文
+}
+
+message SetupTaskRequest
+{
+  int64  task_id            = 1;
+  int64  platform_id        = 2;
+  string process_flow_id    = 3;           // 工艺流程 ID
+  map<string, string> context = 4;        // 配置上下文
+}
+
+message StartTaskRequest {
+  int64  task_id                 = 1;
+  int64  platform_id             = 2;
+  string process_flow_id         = 3;      // 工艺流程 ID
+  repeated SamplingTaskInfo sampling_task_infos = 4; // 进样任务信息
+  map<string, string> context    = 5;      // 任务参数（JSON 格式）
+}
+
+message StoreTaskRequest {
+  int64 platform_id = 2; // 平台 ID
+  map<string, string> context = 4;        // 配置上下文
+}
+
+message FinalizeTaskRequest {
+  int64 platform_id = 2; // 平台 ID
+  map<string, string> context = 4;        // 配置上下文
+}
+
+message TaskTrayUsageRequest {
+  int64 platform_id = 1; // 平台 ID
+  int64 task_id     = 2; // 任务 ID
+}
+
+message TaskTrayUsageReply {
+  int64  platform_id     = 2; // 平台 ID（回显）
+  string task_usage_json = 5; // 任务使用情况（JSON 格式）//携带托盘孔位状态
+}
+
+message TaskTracesRequest {
+  int64 task_id     = 1; // 任务 ID
+  int64 platform_id = 2; // 平台 ID
+}
+
+message TaskTracesReply {
+  int64 platform_id = 1; // 平台 ID（回显）
+  int64 task_id     = 3; // 任务 ID（回显）
+  repeated SampleTraceMessage sample_trace_infos = 5;
+}
+
+//任务中器皿情况
+message TaskTrayLabwareInfoRequest 
+{
+  int64 task_id     = 1; // 任务 ID
+  int64 platform_id = 2; // 平台 ID
+}
+message TaskTrayLabwareInfoReply
+{
+  int64  platform_id = 1; // 平台 ID（回显）
+  int64  task_id     = 3; // 任务 ID（回显） 
+  string task_tray_labware_info_json = 5; //任务中器皿情况（JSON 格式）
+}
+
+message TaskTrayInitialBindingInfoRequest
+{
+  int64 task_id     = 1; // 任务 ID
+  int64 platform_id = 2; // 平台 ID
+}
+message TaskTrayInitialBindingInfoReply
+{
+  int64  platform_id = 1; // 平台 ID（回显）
+  int64  task_id     = 3; // 任务 ID（回显）
+  string task_tray_initial_binding_info_json = 5; //任务中各孔位首次扫码绑定信息情况（JSON 格式）
+}
+
+
+// ----------------------------------------
+// 监控服务
+// ----------------------------------------
+
+message StartMonitorRequest {
+  int64 platform_id       = 2; // 平台 ID
+  int32 monitor_interval  = 5; // 监控间隔（毫秒）
+  repeated string monitor_keys = 1; // 监控项键名，为空表示监控所有
+}
+
+message MonitorSnapshotRequest {
+  int64 platform_id = 2;
+  repeated string monitor_keys = 1; // 监控项键名
+}
+
+message MonitorEvent {
+  int64 platform_id = 3; // 平台 ID（回显）
+  google.protobuf.Timestamp record_time = 20; // 记录时间
+  Status status = 1; // 当前监控状态
+  repeated MonitorItem monitor_items = 5; // 监控数据项列表
+}
+
+message MonitorItem {
+  string module_name               = 11; // 模块名称
+  string monitor_key_description   = 12; // 监控项中文描述
+  string monitor_key               = 13; // 监控项标识（键）
+  string monitor_value             = 14; // 监控值
+  string monitor_unit              = 15; // 单位
+
+}
+
+// ----------------------------------------
+// 实验追踪与数据
+// ----------------------------------------
+
+message SampleTraceMessage {
+  int64  original_sample_id         = 1;       // 原始进样 ID
+  int64  sample_id                  = 2;       // 唯一进样 ID
+  int32  sample_group_id            = 3;       // 进样组 ID
+  string sample_type                = 4;       // 样品类型
+  string sample_name                = 5;       // 样品名称
+  string sample_sn                  = 6;       //样品二维码
+  string sample_remarks             = 7;       // 样品备注
+  string module_action_id           = 8;       // 模块动作 ID
+  int32  module_serial_number       = 9;       // 模块序列号
+  string module_name                = 10;      // 模块名称
+  string labware_name               = 11;      // 样品器皿名称
+  string module_action_description  = 12;      // 当前动作描述（如加盐/浓缩）
+  repeated EbrMessage ebr_infos     = 13;      // 实验数据项
+  google.protobuf.Timestamp start_time   = 14; // 开始时间
+  google.protobuf.Timestamp end_time     = 15; // 结束时间
+  double elapsed_time               = 16;      // 执行耗时（秒）
+
+  // 实验数据项（EBR：Electronic Batch Record）
+  message EbrMessage {
+    string key_description = 10; // 数据项中文描述
+    string key             = 11; // 数据项键
+    string value           = 12; // 数据值
+    string unit            = 13; // 单位
+    google.protobuf.Timestamp record_time = 20; // 记录时间
+  }
+}
+// ----------------------------------------
+// 任务事件流（实时反馈）
+// ----------------------------------------
+
+message TaskEvent {
+  StartTaskStatus start_task_status  = 1; // 任务状态
+  int64  platform_task_id            = 2; // 平台任务 ID
+  int64  platform_id                 = 3; // 平台 ID
+  int64  task_id                     = 4; // 实验任务 ID
+  string platform_name               = 6; // 平台名称
+  google.protobuf.Timestamp response_time = 10;  //响应时间
+  SampleTraceMessage sample_trace_message = 101; //样品实验数据报告（可选）
+}
+
+// ----------------------------------------
+// 服务定义
+// ----------------------------------------
+
+// 平台初始化服务
+service PlatformInitService {
+  /*
+  * 初始化
+  */
+  rpc Initialize(InitializeRequest) returns (Status);
+}
+
+// 平台运行时控制服务
+service PlatformRuntimeService {
+  /*
+  * 获取平台状态
+  */
+  rpc GetPlatformStatus(PlatformRequest) returns (PlatformStatusResponseMessage);
+  /*
+  * 复位
+  */
+  rpc ResetPlatform(PlatformRequest) returns (Status);
+  /*
+  * 暂停
+  */
+  rpc PausePlatform(PlatformRequest) returns (Status);
+  /*
+  * 恢复
+  */
+  rpc ResumePlatform(PlatformRequest) returns (Status);
+  /*
+  * 停止
+  */
+  rpc StopPlatform(PlatformRequest) returns (Status);
+  /*
+  * 启动平台
+  */
+  rpc StartPlatform(PlatformRequest) returns (Status);
+  /*
+  * 平台告警信息流
+  */
+  rpc GetPlatformAlarms(PlatformRequest) returns (stream AlarmEvent);
+}
+
+// 平台任务服务
+service PlatformTaskService {
+  /*
+  * 准备实验任务
+  */
+  rpc PrepareTask(PrepareTaskRequest) returns (Status);
+  /*
+  * 设置开始任务参数
+  */
+  rpc SetupTask(SetupTaskRequest) returns (Status);
+  /*
+  * 开始实验任务
+  */
+  rpc StartTask(StartTaskRequest) returns (stream TaskEvent);
+  /*
+  * 实验封存
+  */
+  rpc StoreTask(StoreTaskRequest) returns (Status);
+  /*
+  * 实验收尾
+  */
+  rpc FinalizeTask(FinalizeTaskRequest) returns (Status);
+  /*
+  * 获取任务追踪信息
+  */
+  rpc GetTaskTraces(TaskTracesRequest) returns (TaskTracesReply);
+  /*
+  * 获取任务中托盘使用情况
+  */
+  rpc GetTaskTraykUsage(TaskTrayUsageRequest) returns (TaskTrayUsageReply);
+  /*
+  * 获取任务中托盘器皿信息
+  */
+  rpc GetTaskTrayLabwareInfo(TaskTrayLabwareInfoRequest) returns (TaskTrayLabwareInfoReply);
+ /*
+  * 获取任务中各孔位首次扫码绑定信息
+  */
+  rpc GetTrayInitialBindingInfo (TaskTrayInitialBindingInfoRequest) returns (TaskTrayInitialBindingInfoReply);
+}
+
+// 平台监控服务
+service PlatformMonitorService {
+  /*
+  * 监控流
+  */
+  rpc StartMonitor(StartMonitorRequest) returns (stream MonitorEvent);
+  /*
+  * 获取监控快照
+  */
+  rpc GetMonitorSnapshot(MonitorSnapshotRequest) returns (MonitorEvent);
+}
+
+// 配置管理服务
+service ConfigService {
+  /*
+  * 获取实验室配置
+  */
+  rpc GetLaboratoryConfigs(google.protobuf.Empty) returns (LaboratoryDefinition);
+}
+
+// 平台中转服务
+service PlatformTransferService {
+  /*
+  * 中转初始化
+  */
+  rpc TransferInit(TransferInitRequest) returns (TransferInitResponseMessage);
+  /*
+  * 获取中转状态
+  */
+  rpc GetTransferStatus(TransferStatusRequest) returns (TransferStatusResponseMessage);
+  /*
+  * 托盘到中转
+  */
+  rpc TrayToTransfer(TransferTrayMoveRequest) returns (TransferTrayMoveResponse);
+  /*
+  * 中转到托盘(新的样品ID)
+  */
+  rpc TransferToTray(TransferTrayMoveRequest) returns (TransferTrayMoveResponse);
+  /*
+  * 中转下料位 → 相邻中转上料位（横向交接）
+  */
+  rpc UnloadTransferToLoadTransfer(UnloadTransferToLoadTransferRequest) returns (UnloadTransferToLoadTransferResponse);
+  /*
+  * 中转上料位 → 相邻中转下料位（反向横向交接）
+  */
+  rpc LoadTransferToUnloadTransfer(LoadTransferToUnloadTransferRequest) returns (LoadTransferToUnloadTransferResponse);
+  /*
+  * 中转正向移动
+  */
+  rpc TransferForward(TransferMoveRequest) returns (TransferMoveResponseMessage);
+  /*
+  * 中转反向移动
+  */
+  rpc TransferBackward(TransferMoveRequest) returns (TransferMoveResponseMessage);
+
+}

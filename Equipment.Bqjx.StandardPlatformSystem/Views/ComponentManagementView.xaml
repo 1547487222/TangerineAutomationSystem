@@ -1,0 +1,174 @@
+﻿<mah:MetroWindow
+    x:Class="Equipment.Bqjx.StandardPlatformSystem.Views.ComponentManagementView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Converters"
+    xmlns:local="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Views"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    Title="组件管理"
+    Width="1000"
+    Height="600"
+    Icon="../Images/tangerine.ico"
+    IconBitmapScalingMode="HighQuality"
+    OverrideDefaultWindowCommandsBrush="White"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource MaterialDesignWindow}"
+    TitleForeground="White"
+    WindowStartupLocation="CenterOwner">
+
+    <mah:MetroWindow.Resources>
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter" />
+        <converters:BoolToIconConverter x:Key="BoolToIconConverter" />
+    </mah:MetroWindow.Resources>
+
+    <Grid Margin="10" Background="{DynamicResource MaterialDesignPaper}">
+        <DockPanel LastChildFill="True">
+
+            <!--  顶部工具栏  -->
+            <ToolBar DockPanel.Dock="Top" Style="{StaticResource MaterialDesignToolBar}">
+                <TextBlock
+                    Margin="0,0,10,0"
+                    VerticalAlignment="Center"
+                    Text="所属分类：" />
+                <ComboBox
+                    x:Name="partMenu"
+                    Width="150"
+                    DisplayMemberPath="PartName"
+                    ItemsSource="{Binding PartMenuModels}"
+                    SelectedIndex="0"
+                    Style="{StaticResource MaterialDesignComboBox}" />
+
+                <Button
+                    Margin="10,0"
+                    Command="{Binding CreatePartCommand}"
+                    CommandParameter="{Binding ElementName=partMenu, Path=SelectedItem}"
+                    Content="➕ 创建"
+                    Style="{StaticResource MaterialDesignFlatButton}" />
+            </ToolBar>
+
+            <!--  表格主体  -->
+            <DataGrid
+                x:Name="partlist"
+                Margin="0,10,0,0"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                ColumnWidth="*"
+                HeadersVisibility="Column"
+                ItemsSource="{Binding PartModels}"
+                MinRowHeight="40"
+                RowHeaderWidth="0"
+                Style="{StaticResource MaterialDesignDataGrid}"
+                TextElement.FontSize="14">
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Width="auto">
+                        <DataGridTemplateColumn.Header>
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Text="组件名称"
+                                TextAlignment="Center" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding PartName}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  描述  -->
+                    <DataGridTemplateColumn Width="auto" Header="组件描述">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+                                    MinWidth="200"
+                                    AcceptsReturn="True"
+                                    Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                    Text="{Binding Desc, UpdateSourceTrigger=PropertyChanged}"
+                                    TextWrapping="Wrap"
+                                    VerticalScrollBarVisibility="Auto" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  状态图标  -->
+                    <DataGridTemplateColumn Width="Auto" Header="状态">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <materialDesign:PackIcon
+                                    Width="24"
+                                    Height="24"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Foreground="{Binding IsInitialized, Converter={StaticResource BoolToColorConverter}}"
+                                    Kind="{Binding IsInitialized, Converter={StaticResource BoolToIconConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  编辑  -->
+                    <DataGridTemplateColumn Width="Auto" Header="配置">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Command="{Binding SettingEditCommand}"
+                                    Content="编辑配置"
+                                    Style="{StaticResource MaterialDesignFlatButton}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  初始化与关闭  -->
+                    <DataGridTemplateColumn Width="Auto" Header="控制">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <Button
+                                        Margin="2"
+                                        Command="{Binding InitializeCommand}"
+                                        Content="初始化"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                    <Button
+                                        Margin="2"
+                                        Command="{Binding UnInitializeCommand}"
+                                        Content="关闭"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  刷新  -->
+                    <DataGridTemplateColumn Width="Auto" Header="刷新">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Command="{Binding RefreshStatusCommand}"
+                                    Content="刷新状态"
+                                    Style="{StaticResource MaterialDesignFlatButton}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!--  删除  -->
+                    <DataGridTemplateColumn Width="Auto" Header="删除">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.RemovePartCommand}"
+                                    CommandParameter="{Binding}"
+                                    Content="移除"
+                                    Style="{StaticResource MaterialDesignFlatButton}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </DockPanel>
+    </Grid>
+</mah:MetroWindow>

@@ -1,0 +1,213 @@
+﻿<mah:MetroWindow
+    x:Class="Equipment.Bqjx.StandardPlatformSystem.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:attachs="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Depends"
+    xmlns:behaviors="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Behaviors"
+    xmlns:control="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Controls"
+    xmlns:converters="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:handycontrols="https://handyorg.github.io/handycontrol"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:Equipment.Bqjx.StandardPlatformSystem"
+    xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:nodify="https://miroiu.github.io/nodify"
+    xmlns:views="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Views"
+    xmlns:xceed="http://schemas.xceed.com/wpf/xaml/toolkit"
+    x:Name="shell"
+    Title="TangerineAutomationSystem"
+    GlowBrush="Black"
+    Icon="Images/tangerine.ico"
+    IconBitmapScalingMode="HighQuality"
+    OverrideDefaultWindowCommandsBrush="White"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource MaterialDesignWindow}"
+    TitleForeground="White"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    WindowTransitionsEnabled="False"
+    mc:Ignorable="d">
+    <mah:MetroWindow.IconTemplate>
+        <DataTemplate>
+            <Image Source="Images/tangerine.ico" />
+        </DataTemplate>
+    </mah:MetroWindow.IconTemplate>
+
+    <mah:MetroWindow.Resources>
+        <!--  转换器 & 代理  -->
+        <ResourceDictionary>
+            <local:BindingProxy x:Key="EditorProxy" DataContext="{Binding}" />
+            <converters:ConnectorOffsetConverter x:Key="ConnectorOffsetConverter" />
+
+            <!--  工具栏统一按钮样式  -->
+            <Style
+                x:Key="ToolbarButtonStyle"
+                BasedOn="{StaticResource MaterialDesignFlatSecondaryButton}"
+                TargetType="Button">
+                <Setter Property="FontFamily" Value="宋体" />
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="Margin" Value="5" />
+
+            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Defaults.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </mah:MetroWindow.Resources>
+
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <ToolBar DockPanel.Dock="Top" Background="#ECEFF1" Padding="6">
+                <ToolBar.Resources>
+                    <!-- 工业风大按钮样式 -->
+                    <Style x:Key="IndustrialToolbarButtonStyle" TargetType="Button" BasedOn="{StaticResource ToolbarButtonStyle}">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,6"/>
+                        <Setter Property="Margin" Value="4,0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="PART_Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <materialDesign:PackIcon Width="24" Height="24"
+                                                          Foreground="#37474F"
+                                                          Kind="{TemplateBinding Tag}"/>
+                                            <TextBlock Margin="8,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontFamily="Segoe UI Semibold"
+                                           Foreground="#263238"
+                                           FontSize="15"
+                                           Text="{TemplateBinding Content}"/>
+                                        </StackPanel>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="PART_Border" Property="Background" Value="#CFD8DC"/>
+                                            <Setter TargetName="PART_Border" Property="Effect">
+                                                <Setter.Value>
+                                                    <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.3" Color="#90A4AE"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="PART_Border" Property="Background" Value="#B0BEC5"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ToolBar.Resources>
+
+                <!-- 第一组 -->
+                <Button Command="{Binding OpenPartManageCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="VideoInputComponent"
+            Content="组件管理"/>
+                <Button Command="{Binding ImportFlowCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileImport"
+            Content="流程导入"/>
+                <Button Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileImport"
+            Content="模块导入"/>
+
+                <Separator/>
+
+                <!-- 第二组 -->
+                <Button Command="{Binding OpenScriptEditorCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileEditOutline"
+            Content="脚本编辑器"/>
+                <Button Command="{Binding OpenTemplateCodeGenerationEditorCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileEditOutline"
+            Content="模版代码生成"/>
+                <Button Command="{Binding OpenGrpcProjectGenerateCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileEditOutline"
+            Content="Grpc项目生成"/>
+                <Button Command="{Binding OpenParameterTableManagerViewCommand}" 
+            Style="{StaticResource IndustrialToolbarButtonStyle}"
+            Tag="FileEditOutline"
+            Content="参数表管理"/>
+            </ToolBar>
+
+
+
+            <!--  主体内容  -->
+            <materialDesign:Card>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <!--  左侧流程列表  -->
+                    <Expander
+                        BorderThickness="0,0,0,0"
+                        ExpandDirection="Left"
+                        Style="{StaticResource MaterialDesignExpander}">
+                        <DockPanel LastChildFill="True">
+                            <ToolBar Background="Transparent" DockPanel.Dock="Top">
+                                <Button Style="{StaticResource MaterialDesignFlatDarkBgButton}" Command="{Binding NewFlowCommand}">
+                                    <materialDesign:PackIcon Kind="Sitemap" />
+                                </Button>
+                                <Button
+                                    Margin="2,0,2,0"
+                                    Command="{Binding DeleteFlowCommand}"
+                                    CommandParameter="{Binding ElementName=flows, Path=SelectedItem}"
+                                    Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                    <materialDesign:PackIcon Kind="Delete" />
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignToolForegroundButton}">
+                                    <materialDesign:PackIcon Kind="ContentCopy" />
+                                </Button>
+                            </ToolBar>
+
+                            <ListBox
+                                Name="flows"
+                                ItemsSource="{Binding FlowModels}"
+                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                SelectedIndex="0"
+                                SelectedItem="{Binding SelectedModel}"
+                                Style="{StaticResource MaterialDesignNavigationPrimaryListBox}">
+
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock
+                                                MaxWidth="250"
+                                                Margin="0,5,0,5"
+                                                FontFamily="宋体"
+                                                FontSize="18"
+                                                Text="{Binding FlowName}"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+
+                            </ListBox>
+                        </DockPanel>
+                    </Expander>
+
+                    <!--  主编辑区内容  -->
+                    <ContentControl
+                        Grid.Column="1"
+                        Background="Red"
+                        Content="{Binding ElementName=flows, Path=SelectedItem.FlowContent}"
+                        DataContext="{Binding ElementName=flows, Path=SelectedItem}" />
+
+                </Grid>
+            </materialDesign:Card>
+        </DockPanel>
+    </Grid>
+</mah:MetroWindow>

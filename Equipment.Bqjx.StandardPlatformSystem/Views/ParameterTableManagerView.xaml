@@ -1,0 +1,596 @@
+﻿<mah:MetroWindow
+    x:Class="Equipment.Bqjx.StandardPlatformSystem.Views.ParameterTableManagerView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Views"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:Equipment.Bqjx.StandardPlatformSystem.Models"
+    Title="参数表管理"
+    Width="1000"
+    Height="600"
+    Icon="../Images/tangerine.ico"
+    IconBitmapScalingMode="HighQuality"
+    OverrideDefaultWindowCommandsBrush="White"
+    ResizeMode="CanResizeWithGrip"
+    Style="{StaticResource MaterialDesignWindow}"
+    TitleForeground="White"
+    mc:Ignorable="d">
+
+    <mah:MetroWindow.Resources>
+
+        <!--  功能码表模板  -->
+        <DataTemplate x:Key="ModuleFuncCodeTableTemplate">
+            <DockPanel Margin="10">
+                <ToolBar Background="Transparent" DockPanel.Dock="Top">
+                    <Button Command="{Binding AddCommand}" Content="添加模块功能码" />
+                    <Button
+                        Command="{Binding CopyModuleInfoParameterCommand}"
+                        CommandParameter="{Binding ElementName=funcCodeTable, Path=SelectedItem}"
+                        Content="拷贝选中项" />
+                </ToolBar>
+
+                <DataGrid
+                    x:Name="funcCodeTable"
+                    Margin="0,5,0,0"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    ItemsSource="{Binding Tables}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        MinWidth="50"
+                                        MaxHeight="30"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=DataGrid}, Path=DataContext.DeleteCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button}">
+                                        <materialDesign:PackIcon Kind="Remove" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="模块">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        MinWidth="100"
+                                        DisplayMemberPath="DisplayModuleName"
+                                        ItemsSource="{Binding ModuleInfoParameterModels}"
+                                        SelectedItem="{Binding SelectedModuleInfoParameter, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="功能码">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox
+                                        MinWidth="100"
+                                        FontSize="15"
+                                        Text="{Binding FuncCode, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="描述">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox
+                                        MinWidth="100"
+                                        FontSize="15"
+                                        Text="{Binding FuncCodeDescription, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="参数必填" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding RequiresParameter, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.Header>
+                                <TextBlock Text="监控参数反馈" />
+                            </DataGridTemplateColumn.Header>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsMonitorFuncCodeParameterFeedback, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="功能码参数">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding OpenEditModuleFuncCodeParameterViewCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="监控数据参数">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding OpenEditModuleMonitorInfoItemViewCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="EBR数据参数">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding OpenEditModuleEbrInfoItemViewCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="精度数据参数">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding OpenEditModulePrecisionInfoItemViewCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="100"
+                            Binding="{Binding MonitorInterval, UpdateSourceTrigger=PropertyChanged}"
+                            Header="监控间隔/ms" />
+                        <DataGridTextColumn
+                            MinWidth="100"
+                            Binding="{Binding EbrReadStartInterval, UpdateSourceTrigger=PropertyChanged}"
+                            Header="Ebr读取开始间隔/ms" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </DataTemplate>
+
+
+
+        <!--  模块信息表模板  -->
+        <DataTemplate x:Key="ModuleInfoTableTemplate">
+            <DockPanel Margin="10">
+                <ToolBar Background="Transparent" DockPanel.Dock="Top">
+                    <Button Command="{Binding AddCommand}" Content="添加模块" />
+                </ToolBar>
+
+                <DataGrid
+                    Margin="0,5,0,0"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    ItemsSource="{Binding Tables}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        MinWidth="50"
+                                        MaxHeight="30"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=DataGrid}, Path=DataContext.DeleteCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button}">
+                                        <materialDesign:PackIcon Kind="Remove" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="150"
+                            Binding="{Binding ModuleName, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块名称" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleDescription, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块描述" />
+                        <DataGridTextColumn
+                            MinWidth="100"
+                            Binding="{Binding ModuleSerialNumber, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块序列号" />
+                        <DataGridTextColumn
+                            MinWidth="100"
+                            Binding="{Binding ModuleIdentifier, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块编号" />
+                        <DataGridTextColumn
+                            MinWidth="100"
+                            Binding="{Binding ModuleSpec, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块规格" />
+                        <DataGridTemplateColumn Header="模块控制器">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        MinWidth="150"
+                                        DisplayMemberPath="PartDesc"
+                                        ItemsSource="{Binding RefPartModels}"
+                                        SelectedItem="{Binding RefPartModel,UpdateSourceTrigger=PropertyChanged}"
+                                        Style="{StaticResource MaterialDesignComboBox}"
+                                        ToolTip="选择模块控制器" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleFuncCodeAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="功能码地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleFuncStateCodeAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="功能码状态地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleStateAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块状态地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleParameterAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="参数地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleObserveDataAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="监控地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleHomeControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="初始化地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleHomeStateAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="初始化状态" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleResetControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="复位地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleStopControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="停止地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleEmergencyControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="急停地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleStartControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="启动地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModulePauseControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="暂停地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleManualAutoControlAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="手动/自动地址" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleAlrmAddress, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="报警地址" />
+                        <DataGridTextColumn
+                            MinWidth="150"
+                            Binding="{Binding ModuleAlrmAddressLength, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="报警长度" />
+                        <DataGridTemplateColumn Header="报警数据参数">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <ToggleButton
+                                            x:Name="PopupToggle"
+                                            Margin="5"
+                                            Content="编辑参数"
+                                            Focusable="False"
+                                            FontSize="15"
+                                            Style="{StaticResource MaterialDesignFlatButton}" />
+                                        <Popup
+                                            Width="700"
+                                            AllowsTransparency="True"
+                                            IsOpen="{Binding IsChecked, ElementName=PopupToggle}"
+                                            Placement="Left"
+                                            PlacementTarget="{Binding ElementName=PopupToggle}"
+                                            PopupAnimation="Fade"
+                                            StaysOpen="False">
+                                            <Border
+                                                Padding="10"
+                                                Background="White"
+                                                BorderBrush="#3C5A76"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Effect="{DynamicResource MaterialDesignShadowDepth2}">
+                                                <DockPanel>
+                                                    <ScrollViewer Height="400" DockPanel.Dock="Top">
+                                                        <ItemsControl ItemsSource="{Binding AlarmItemModels}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <WrapPanel Orientation="Horizontal" />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Grid>
+                                                                        <Border
+                                                                            Width="210"
+                                                                            Margin="5"
+                                                                            BorderBrush="#DDD"
+                                                                            BorderThickness="1"
+                                                                            CornerRadius="4">
+
+                                                                            <StackPanel>
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                    <TextBlock
+                                                                                        Margin="0,0,2,0"
+                                                                                        VerticalAlignment="Center"
+                                                                                        FontWeight="Bold"
+                                                                                        Text="报警描述:" />
+                                                                                    <TextBox
+                                                                                        Width="150"
+                                                                                        Margin="0,4,0,2"
+                                                                                        VerticalAlignment="Center"
+                                                                                        Text="{Binding AlarmDescription, UpdateSourceTrigger=PropertyChanged}"
+                                                                                        TextWrapping="Wrap"
+                                                                                        ToolTip="报警描述" />
+                                                                                </StackPanel>
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                    <TextBlock
+                                                                                        Margin="0,0,2,0"
+                                                                                        VerticalAlignment="Center"
+                                                                                        FontWeight="Bold"
+                                                                                        Text="报警地址:" />
+                                                                                    <TextBox
+                                                                                        Width="150"
+                                                                                        Margin="0,4,0,2"
+                                                                                        VerticalAlignment="Center"
+                                                                                        Text="{Binding AlarmAddress, UpdateSourceTrigger=PropertyChanged}"
+                                                                                        TextWrapping="Wrap"
+                                                                                        ToolTip="报警地址" />
+                                                                                </StackPanel>
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                        <Button
+                                                                            HorizontalAlignment="Right"
+                                                                            VerticalAlignment="Top"
+                                                                            Command="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=ItemsControl}, Path=DataContext.RemoveAlarmItemCommand}"
+                                                                            CommandParameter="{Binding}"
+                                                                            FontSize="20"
+                                                                            Style="{StaticResource MahApps.Styles.Button.Circle}">
+                                                                            <materialDesign:PackIcon Foreground="Red" Kind="CloseCircle" />
+                                                                        </Button>
+                                                                    </Grid>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </ScrollViewer>
+                                                    <StackPanel
+                                                        Margin="0,8,0,0"
+                                                        HorizontalAlignment="Right"
+                                                        DockPanel.Dock="Bottom"
+                                                        Orientation="Horizontal">
+                                                        <Button
+                                                            Margin="0,0,8,0"
+                                                            Command="{Binding ImportAlarmItemCommand}"
+                                                            Content="导入参数"
+                                                            Style="{StaticResource MaterialDesignOutlinedButton}" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </DataTemplate>
+
+        <!--  托盘表模板  -->
+        <DataTemplate x:Key="LabTrayParameterTableTemplate">
+            <DockPanel Margin="10">
+                <ToolBar Background="Transparent" DockPanel.Dock="Top">
+                    <Button Command="{Binding AddCommand}" Content="添加托盘" />
+
+                    <Button
+                        Command="{Binding CopyCommand}"
+                        CommandParameter="{Binding ElementName=labTrayParameterTable, Path=SelectedItem}"
+                        Content="复制选中托盘" />
+                </ToolBar>
+
+                <DataGrid
+                    x:Name="labTrayParameterTable"
+                    Margin="0,5,0,0"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    ItemsSource="{Binding Tables}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        MinWidth="50"
+                                        MaxHeight="30"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=DataGrid}, Path=DataContext.DeleteCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button}">
+                                        <materialDesign:PackIcon Kind="Remove" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="150"
+                            Binding="{Binding LabTrayCategory, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="托盘类别" />
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding LabTrayName, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="托盘名称" />
+                        <DataGridTextColumn
+                            MinWidth="150"
+                            Binding="{Binding LabTrayCode, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="托盘编号" />
+                        <DataGridTextColumn
+                            MinWidth="150"
+                            Binding="{Binding LabTrayDescription, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="托盘描述" />
+                        <mah:DataGridNumericUpDownColumn
+                            MinWidth="200"
+                            Binding="{Binding FirstMaterialId, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="物料FirstId" />
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding EditCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </DataTemplate>
+
+        <!--  模块通道表模板  -->
+        <DataTemplate x:Key="ModuleChannelGroupParameterTableTemplate">
+            <DockPanel Margin="10">
+                <ToolBar Background="Transparent" DockPanel.Dock="Top">
+                    <Button Command="{Binding AddCommand}" Content="添加模块通道" />
+                </ToolBar>
+
+                <DataGrid
+                    Margin="0,5,0,0"
+                    AutoGenerateColumns="False"
+                    CanUserAddRows="False"
+                    ItemsSource="{Binding Tables}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        MinWidth="50"
+                                        MaxHeight="30"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorLevel=1, AncestorType=DataGrid}, Path=DataContext.DeleteCommand}"
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource MahApps.Styles.Button}">
+                                        <materialDesign:PackIcon Kind="Remove" />
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="模块">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox
+                                        MinWidth="100"
+                                        DisplayMemberPath="DisplayModuleName"
+                                        ItemsSource="{Binding ModuleInfoParameterModels}"
+                                        SelectedItem="{Binding SelectedModuleInfoParameter, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn
+                            MinWidth="200"
+                            Binding="{Binding ModuleChannelGroupName, UpdateSourceTrigger=PropertyChanged}"
+                            FontSize="15"
+                            Header="模块通道组名称" />
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Margin="5"
+                                        Command="{Binding EditCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="编辑参数"
+                                        Focusable="False"
+                                        FontSize="15"
+                                        Style="{StaticResource MaterialDesignFlatButton}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </DataTemplate>
+
+        <!--  模板选择器  -->
+        <models:TableTemplateSelector
+            x:Key="TableTemplateSelector"
+            LabTrayParameterTableTemplate="{StaticResource LabTrayParameterTableTemplate}"
+            ModuleChannelGroupParameterTableTemplate="{StaticResource ModuleChannelGroupParameterTableTemplate}"
+            ModuleFuncCodeTableTemplate="{StaticResource ModuleFuncCodeTableTemplate}"
+            ModuleInfoTableTemplate="{StaticResource ModuleInfoTableTemplate}" />
+    </mah:MetroWindow.Resources>
+
+    <Grid>
+        <TabControl
+            Margin="10"
+            ItemsSource="{Binding TabItems}"
+            SelectedIndex="0">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Padding="10,2" Text="{Binding TableName}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding TableModel}" ContentTemplateSelector="{StaticResource TableTemplateSelector}" />
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </Grid>
+</mah:MetroWindow>

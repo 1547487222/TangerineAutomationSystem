@@ -1,0 +1,86 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="1000">
+    <Grid>
+        <DockPanel LastChildFill="True">
+            <Border DockPanel.Dock="Top"  Margin="2">
+                <Grid >
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <Button Content="连接" Margin="5" Command="{Binding ConnectCommand}"/>
+                        <Button Content="清除数据" Margin="5" Command="{Binding ClearDataInfoCommand}"/>
+                        <Button Content="断开连接" Margin="5" Command="{Binding DisConnectCommand}"/>
+                    </WrapPanel>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Ellipse>
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Width" Value="30"/>
+                                    <Setter Property="Height" Value="30"/>
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Connected}" Value="true">
+                                            <Setter Property="Ellipse.Fill" Value="Green"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Connected}" Value="false">
+                                            <Setter Property="Ellipse.Fill" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                    </WrapPanel>
+                </Grid >
+            </Border>
+            <Border  Margin="2" DockPanel.Dock="Left">
+                <ItemsControl  ItemsSource="{Binding PubmqttSubjects}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Margin="5" Content="{Binding PubSubjectName}" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window},Path=DataContext.PubCommand}" CommandParameter="{Binding Self}"/>
+                                <xctk:PropertyGrid  SelectedObject="{Binding Paramter,Mode=TwoWay}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Border>
+            <Border  Margin="2" DockPanel.Dock="Left">
+                <ItemsControl  ItemsSource="{Binding SubmqttSubjects}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Margin="2"  Content="{Binding SubjectName}" IsChecked="{Binding IsEnable}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Border>
+           
+            <ListBox  ItemsSource="{Binding Message}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border  Margin="5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="Purple" FontSize="25" Text="{Binding Topic}"/>
+                                <TextBox IsReadOnly="True" TextWrapping="WrapWithOverflow" FontSize="20" Text="{Binding Message}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</Window>

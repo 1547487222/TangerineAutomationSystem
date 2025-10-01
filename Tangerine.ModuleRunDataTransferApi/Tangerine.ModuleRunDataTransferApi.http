@@ -1,0 +1,6 @@
+@Tangerine.ModuleRunDataTransferApi_HostAddress = http://localhost:5014
+
+GET {{Tangerine.ModuleRunDataTransferApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

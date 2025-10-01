@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="Equipment.Bqjx.StandardPlatformSystem.Views.GenerateEditorContentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xceed="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 内容区域 -->
+        <ScrollViewer Grid.Row="0">
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 模块基础信息 -->
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="基础模块信息" FontWeight="Bold" Margin="0 0 0 5"/>
+                    <xceed:PropertyGrid SelectedObject="{Binding BqjxModuleMake.BqjxModuleBaseDef}" />
+                    <Button Content="添加子类" Command="{Binding AddModuleImplCommand}" Margin="0 10 0 0" />
+                </StackPanel>
+
+                <!-- 分隔 -->
+                <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Gray"/>
+
+                <!-- 子类模块列表 -->
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="子类模块配置" FontWeight="Bold" Margin="0 0 0 5"/>
+                    <ItemsControl ItemsSource="{Binding BqjxModuleMake.BqjxModuleImplDef}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <xceed:PropertyGrid SelectedObject="{Binding}" Margin="0 5"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- 底部按钮 -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 0">
+            <Button Command="{Binding ExportScriptCommand}" Content="导出" Width="80"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

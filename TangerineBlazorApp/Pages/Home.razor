@@ -1,0 +1,182 @@
+﻿@inject INotificationService _notice
+@inject PlatformScheduleService platformScheduleService
+@using TangerineBlazorApp.Models
+@using System.Collections.ObjectModel
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<div style="background:#ECECEC;">
+    <Card  style="margin:10px">
+        <TitleTemplate>
+            <Icon Type="@IconType.Outline.Tags" />操作
+        </TitleTemplate>
+        <Body>
+            <Flex Gap="FlexGap.Middle" Direction="FlexDirection.Horizontal">
+                <Button OnClick="OnInit">初始化</Button>
+                <Button OnClick="OnRun" >开始任务</Button>
+                <Button OnClick="OnPause" >暂停</Button>
+                <Button OnClick="OnResume">唤醒</Button>
+                <Button OnClick="OnReset">报警复位</Button>
+                <Button OnClick="OnStop">停止</Button>
+            </Flex>
+        </Body>
+    </Card>
+    <Card style="margin:10px">
+        <TitleTemplate>
+            <Icon Type="@IconType.Outline.BorderOuter" />操作状态
+        </TitleTemplate>
+        <Body>
+            <div>
+                <GridRow>
+                    @foreach (var item in FlowConfigs)
+                    {
+                        <GridCol Flex=@("auto")>
+                            <Card style="margin:10px">
+                                <TitleTemplate>
+                                    <Icon Type="@IconType.Outline.BorderOuter" />@item.FlowName
+                                </TitleTemplate>
+                                <Body>
+                                    <Timeline>
+                                        @foreach (var stateInfo in PlatformStateInfos[item.FlowName])
+                                        {
+                                            <TimelineItem Color="@stateInfo.State" Label="@stateInfo.Message" />
+                                        }
+                                    </Timeline>
+                                </Body>
+                            </Card>
+                     </GridCol>
+                    }
+                </GridRow>
+            </div>
+        </Body>
+    </Card>
+</div>
+
+@code{
+
+    private static ObservableCollection<FlowConfig> FlowConfigs { get; set; } = new ObservableCollection<FlowConfig>();
+
+    private static Dictionary<string, ObservableCollection<PlatformStateInfo>> PlatformStateInfos { get; set; } = new Dictionary<string, ObservableCollection<PlatformStateInfo>>();
+
+    private static bool IsInit { get; set; } = false;
+
+    private SemaphoreSlim _initSemaphoreSlim = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _runSemaphoreSlim = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _pauseSemaphoreSlim = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _resumeSemaphoreSlim = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _resetSemaphoreSlim = new SemaphoreSlim(1, 1);
+    private SemaphoreSlim _stopSemaphoreSlim = new SemaphoreSlim(1, 1);
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsInit)
+        {
+            var configs = await platformScheduleService.GetFlowConfigsAsync();
+            foreach (var item in configs)
+            {
+                FlowConfigs.Add(item);
+            }
+
+            foreach (var item in FlowConfigs)
+            {
+                PlatformStateInfos[item.FlowName] = new
+                 ObservableCollection<PlatformStateInfo>();
+            }
+            platformScheduleService.PlatformStateChanged += (platformStateInfo) =>
+            {
+                PlatformStateInfos[platformStateInfo.PlatformName].Add(platformStateInfo);
+                InvokeAsync(StateHasChanged);
+            };
+            platformScheduleService.PlatformMessageNotification += async (message) => 
+            {
+                await OpenWithPlacement(message).ConfigureAwait(false);
+            };
+            IsInit = true;
+        }
+    }
+
+    public async Task OpenWithPlacement(string message)
+    {
+        NotificationPlacement placement = NotificationPlacement.Top;
+        var config = new NotificationConfig()
+            {
+                Message = message,
+                Placement = placement
+            };
+#if DEBUG
+        config.Duration = 0;
+#endif
+
+        await _notice.Open(config).ConfigureAwait(false);
+    }
+
+    private async Task OnInit()
+    {
+        if (_initSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("初始化中...");
+        }
+        await _initSemaphoreSlim.WaitAsync();
+        PlatformStateInfos.Values.ToList().Clear();
+        await platformScheduleService.InitPlatformAsync();
+        _initSemaphoreSlim.Release();
+    }
+
+    private async Task OnRun()
+    {
+        if (_runSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("任务执行中...");
+        }
+        await _runSemaphoreSlim.WaitAsync();
+        PlatformStateInfos.Values.ToList().Clear();
+        await platformScheduleService.StartPlatformTaskAsync();  
+        _initSemaphoreSlim.Release();
+    }
+
+    private async Task OnPause()
+    {
+        if (_pauseSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("任务暂停中...");
+        }
+        await _pauseSemaphoreSlim.WaitAsync();
+        await platformScheduleService.PausePlatformTaskAsync();
+        _pauseSemaphoreSlim.Release();
+    }
+
+    private async Task OnResume()
+    {
+        if (_resumeSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("任务唤醒中...");
+        }
+        await _resumeSemaphoreSlim.WaitAsync();
+        await platformScheduleService.ContinuePlatformTaskAsync();
+        _resumeSemaphoreSlim.Release();
+    }
+
+    private async Task OnReset()
+    {
+        if (_resetSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("平台复位中...");
+        }
+        await _resetSemaphoreSlim.WaitAsync();
+        await platformScheduleService.ResetPlatformTaskAsync();
+        _resetSemaphoreSlim.Release();
+    }
+
+    private async Task OnStop()
+    {
+        if (_stopSemaphoreSlim.CurrentCount == 0)
+        {
+            await OpenWithPlacement("平台停止中...");
+        }
+        await _stopSemaphoreSlim.WaitAsync();
+        await platformScheduleService.StopPlatformTaskAsync();
+        _stopSemaphoreSlim.Release();
+    }
+}
